@@ -1,0 +1,309 @@
+/* poolMember.module.css */
+
+.memberAvatar {
+    width: 80px;
+    height: 80px;
+}
+
+.memberAvatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border: 3px solid #fff;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.statIcon {
+    width: 50px;
+    height: 50px;
+    background: linear-gradient(135deg, #FFC371 0%, #FF796E 100%);
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto;
+}
+
+.statIcon i {
+    font-size: 1.5rem;
+    color: white;
+}
+
+.tabNavigation {
+    display: flex;
+    border-bottom: 1px solid #e9ecef;
+    padding: 0 1rem;
+}
+
+.tabButton {
+    background: none;
+    border: none;
+    padding: 1rem 1.5rem;
+    font-weight: 500;
+    color: #6c757d;
+    border-bottom: 2px solid transparent;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+}
+
+.tabButton:hover {
+    color: #495057;
+    background-color: #f8f9fa;
+}
+
+.tabActive {
+    color: #FF796E;
+    border-bottom-color: #FF796E;
+    background-color: rgba(255, 121, 110, 0.05);
+}
+
+.infoGrid {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.infoItem {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.75rem 0;
+    border-bottom: 1px solid #f1f3f4;
+}
+
+.infoLabel {
+    color: #6c757d;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+}
+
+.infoValue {
+    font-weight: 600;
+    color: #212529;
+}
+
+.progressContainer {
+    background: #f8f9fa;
+    border-radius: 12px;
+    padding: 1.5rem;
+}
+
+.progressHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.75rem;
+    font-weight: 600;
+}
+
+.progressBar {
+    height: 8px;
+    background-color: #e9ecef;
+    border-radius: 4px;
+    overflow: hidden;
+    margin-bottom: 1rem;
+}
+
+.progressFill {
+    height: 100%;
+    background: linear-gradient(90deg, #FFC371 0%, #FF796E 100%);
+    border-radius: 4px;
+    transition: width 0.5s ease;
+}
+
+.progressStats {
+    display: flex;
+    justify-content: space-between;
+    gap: 1rem;
+}
+
+.progressStat {
+    text-align: center;
+    flex: 1;
+}
+
+.progressStat span {
+    display: block;
+    font-size: 0.875rem;
+    color: #6c757d;
+    margin-bottom: 0.25rem;
+}
+
+.progressStat strong {
+    font-size: 1.25rem;
+    color: #212529;
+}
+
+.contributionsTable th {
+    border-top: none;
+    font-weight: 600;
+    color: #6c757d;
+    background-color: #f8f9fa;
+}
+
+.transactionId {
+    font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+    font-size: 0.875rem;
+    color: #6c757d;
+}
+
+.activityTimeline {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.activityItem {
+    display: flex;
+    align-items: flex-start;
+    gap: 1rem;
+    padding: 1rem;
+    background: #f8f9fa;
+    border-radius: 12px;
+    transition: all 0.3s ease;
+}
+
+.activityItem:hover {
+    background: #e9ecef;
+    transform: translateX(4px);
+}
+
+.activityIcon {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.activityIcon.contribution {
+    background: rgba(40, 167, 69, 0.1);
+    color: #28a745;
+}
+
+.activityIcon.join {
+    background: rgba(0, 123, 255, 0.1);
+    color: #007bff;
+}
+
+.activityIcon.update {
+    background: rgba(255, 193, 7, 0.1);
+    color: #ffc107;
+}
+
+.activityContent {
+    flex: 1;
+}
+
+.activityTitle {
+    font-weight: 600;
+    color: #212529;
+    margin-bottom: 0.25rem;
+}
+
+.activityDescription {
+    color: #6c757d;
+    font-size: 0.875rem;
+    margin-bottom: 0.25rem;
+}
+
+.activityTime {
+    color: #adb5bd;
+    font-size: 0.75rem;
+}
+
+.activityAmount {
+    font-weight: 600;
+    color: #28a745;
+    font-size: 1.125rem;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .memberAvatar {
+        width: 60px;
+        height: 60px;
+    }
+
+    .tabNavigation {
+        flex-direction: column;
+    }
+
+    .tabButton {
+        justify-content: center;
+        border-bottom: none;
+        border-left: 2px solid transparent;
+    }
+
+    .tabActive {
+        border-bottom-color: transparent;
+        border-left-color: #FF796E;
+    }
+
+    .progressStats {
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+
+    .infoItem {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.25rem;
+    }
+}
+
+/* Glass morphism effects */
+.glass {
+    background: rgba(255, 255, 255, 0.8);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.rounded-2xl {
+    border-radius: 16px;
+}
+
+.border-soft {
+    border-color: rgba(0, 0, 0, 0.1) !important;
+}
+
+.shadow-soft {
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+}
+
+/* Social Media Links Styles */
+.socialLinks {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.socialLink {
+    display: flex;
+    align-items: center;
+    padding: 0.75rem 1rem;
+    background: rgba(var(--bs-primary-rgb), 0.1);
+    border: 1px solid rgba(var(--bs-primary-rgb), 0.2);
+    border-radius: 0.75rem;
+    color: var(--bs-primary);
+    text-decoration: none;
+    transition: all 0.2s ease;
+    font-weight: 500;
+}
+
+.socialLink:hover {
+    background: rgba(var(--bs-primary-rgb), 0.2);
+    border-color: rgba(var(--bs-primary-rgb), 0.3);
+    color: var(--bs-primary);
+    text-decoration: none;
+    transform: translateY(-1px);
+}
+
+.socialLink i {
+    font-size: 1.1rem;
+    width: 20px;
+}

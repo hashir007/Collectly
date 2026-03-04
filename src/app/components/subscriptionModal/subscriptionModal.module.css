@@ -1,0 +1,57 @@
+.planCard {
+  transition: all 0.3s ease;
+  border: 2px solid transparent;
+}
+
+.planCard:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+}
+
+.freePlan {
+  border-color: #6c757d;
+}
+
+.freePlan:hover {
+  border-color: #495057;
+}
+
+.monthlyPlan {
+  border-color: #007bff;
+}
+
+.monthlyPlan:hover {
+  border-color: #0056b3;
+}
+
+.yearlyPlan {
+  border-color: #28a745;
+}
+
+.yearlyPlan:hover {
+  border-color: #1e7e34;
+}
+
+.currentPlan {
+  border-color: #ffc107;
+  background-color: #fffdf6;
+}
+
+.planDescription {
+  font-size: 0.9rem;
+  line-height: 1.5;
+}
+
+.planDescription ul {
+  padding-left: 1rem;
+  margin-bottom: 0;
+}
+
+.planDescription li {
+  margin-bottom: 0.25rem;
+}
+
+.payment-section {
+  max-width: 500px;
+  margin: 0 auto;
+}

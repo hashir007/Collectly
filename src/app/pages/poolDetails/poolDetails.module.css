@@ -1,0 +1,54 @@
+/* Report Pool Modal Styles */
+.category-card {
+  transition: all 0.2s ease-in-out;
+  cursor: pointer;
+}
+
+.category-card:hover {
+  background-color: rgba(0, 123, 255, 0.05);
+  border-color: #007bff;
+}
+
+.category-card .form-check-input:checked {
+  background-color: #007bff;
+  border-color: #007bff;
+}
+
+.cursor-pointer {
+  cursor: pointer;
+}
+
+/* Custom checkbox styling */
+.form-check-input {
+  width: 1.1em;
+  height: 1.1em;
+  margin-top: 0.15em;
+}
+
+.form-check-input:focus {
+  border-color: #007bff;
+  box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+}
+
+/* Modal header styling */
+.modal-header {
+  border-bottom: 1px solid #e9ecef;
+  background: linear-gradient(135deg, #fff 0%, #f8f9fa 100%);
+}
+
+/* Button styling */
+.btn-danger:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* Responsive adjustments */
+@media (max-width: 576px) {
+  .category-card {
+    padding: 1rem !important;
+  }
+  
+  .modal-body {
+    padding: 1rem;
+  }
+}
