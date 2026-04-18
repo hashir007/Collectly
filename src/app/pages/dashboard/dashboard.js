@@ -1,379 +1,443 @@
-import classNames from './dashboard.module.css';
-import React, { useState, useEffect, useCallback, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from "react-redux";
-import { Navigate, useLocation, useNavigate, Link } from 'react-router-dom';
+import { Navigate, useLocation, Link } from 'react-router-dom';
 import { Chart } from "react-google-charts";
 import { Hourglass } from 'react-loader-spinner';
 import moment from 'moment';
 import TimeAgo from 'react-timeago';
 import { convertUTCDateToLocalDate } from '../../helpers/dateTimeHelper';
-import {
-    getTotalPoolPaymentByMonths,
-    getTotalPoolPaymentByWeek
-} from "../../slices/finance";
+import { getTotalPoolPaymentByMonths, getTotalPoolPaymentByWeek } from "../../slices/finance";
 import { filterPools } from "../../slices/pool";
-import EventBus from "../../common/eventBus";
-import { ProgressBar, Modal } from 'react-bootstrap';
+import {
+  LuPlus,
+  LuSearch,
+  LuCalendar,
+  LuTrendingUp,
+  LuUsers,
+  LuDollarSign,
+  LuExternalLink,
+  LuZap,
+} from 'react-icons/lu';
 
+/* ─── tiny stat card ─── */
+const StatCard = ({ icon: Icon, label, value, color }) => (
+  <div style={{
+    background: 'white',
+    borderRadius: 24,
+    border: '1px solid rgba(0,0,0,0.05)',
+    boxShadow: '0 4px 16px rgba(0,0,0,0.04)',
+    padding: '20px 22px',
+    display: 'flex',
+    flexDirection: 'column',
+    gap: 10,
+    cursor: 'pointer',
+    transition: 'border-color 0.2s',
+  }}
+    onMouseEnter={(e) => (e.currentTarget.style.borderColor = 'rgba(93,95,239,0.25)')}
+    onMouseLeave={(e) => (e.currentTarget.style.borderColor = 'rgba(0,0,0,0.05)')}
+  >
+    <div style={{
+      width: 40, height: 40, borderRadius: 12,
+      background: color, display: 'flex', alignItems: 'center', justifyContent: 'center',
+      color: 'white',
+    }}>
+      <Icon size={18} />
+    </div>
+    <div>
+      <p style={{ fontSize: '0.75rem', fontWeight: 700, color: 'var(--text-muted)', margin: 0, textTransform: 'uppercase', letterSpacing: '0.08em' }}>{label}</p>
+      <p style={{ fontSize: '1.5rem', fontWeight: 900, color: 'var(--text-dark)', margin: 0, letterSpacing: '-0.03em' }}>{value}</p>
+    </div>
+  </div>
+);
+
+/* ─── inline progress bar ─── */
+const MiniProgress = ({ pct }) => (
+  <div style={{ width: '100%', height: 6, background: 'rgba(93,95,239,0.1)', borderRadius: 99 }}>
+    <div style={{
+      width: `${Math.min(100, pct)}%`, height: '100%',
+      background: 'linear-gradient(90deg,#5D5FEF,#4ADE80)',
+      borderRadius: 99, transition: 'width 0.6s ease',
+    }} />
+  </div>
+);
 
 const Dashboard = () => {
-    const searchParams = useLocation();
-    const navigate = useNavigate();
-    const { user: currentUser } = useSelector((state) => state.auth);
-    const { pools } = useSelector((state) => state.pool);
-    const { monthChart, monthChartTicks, weekChart, weekChartTicks } = useSelector((state) => state.finance);
-    const [myPools, setMyPools] = useState([]);
-    const [userJoinedPools, setUserJoinedPools] = useState([]);
-    const [loading, setLoading] = useState(true);
-    const dispatch = useDispatch();
+  const searchParams = useLocation();
+  const { user: currentUser } = useSelector((state) => state.auth);
+  const { monthChart, monthChartTicks, weekChart, weekChartTicks } = useSelector((state) => state.finance);
+  const [myPools, setMyPools] = useState([]);
+  const [userJoinedPools, setUserJoinedPools] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const dispatch = useDispatch();
 
-    useEffect(() => {
-        const fetchData = async () => {
-            if (currentUser) {
-                setLoading(true);
-                try {
-                    const [monthResponse, weekResponse, ownedPoolsResponse, joinedPoolsResponse] = await Promise.all([
-                        dispatch(getTotalPoolPaymentByMonths({})),
-                        dispatch(getTotalPoolPaymentByWeek({})),
-                        dispatch(filterPools({
-                            page: 1,
-                            pageSize: 10,
-                            term: '',
-                            joined: '',
-                            owner: currentUser.user.id,
-                            closed: '',
-                            opened: '',
-                            orderBy: 'most_recent',
-                            userId: currentUser.user.id
-                        })),
-                        dispatch(filterPools({
-                            page: 1,
-                            pageSize: 10,
-                            term: '',
-                            joined: currentUser.user.id,
-                            owner: '',
-                            closed: '',
-                            opened: '',
-                            orderBy: 'most_recent',
-                            userId: currentUser.user.id
-                        }))
-                    ]);
-
-
-                    setMyPools(ownedPoolsResponse.payload?.Pools?.items || []);
-                    setUserJoinedPools(joinedPoolsResponse.payload?.Pools?.items || []);
-
-                } catch (error) {
-                    console.error('Error fetching data:', error);
-                } finally {
-                    setLoading(false);
-                }
-            }
-        };
-
-        fetchData();
-    }, [currentUser, dispatch]);
-
-    const CustomProgressBar = ({ progressPercentage }) => {
-        return (
-            <div className="progress-container">
-                <ProgressBar
-                    now={progressPercentage}
-                    className="custom-progress-bar"
-                />
-            </div>
-        );
+  useEffect(() => {
+    const fetchData = async () => {
+      if (currentUser) {
+        setLoading(true);
+        try {
+          const [, , ownedRes, joinedRes] = await Promise.all([
+            dispatch(getTotalPoolPaymentByMonths({})),
+            dispatch(getTotalPoolPaymentByWeek({})),
+            dispatch(filterPools({ page: 1, pageSize: 10, term: '', joined: '', owner: currentUser.user.id, closed: '', opened: '', orderBy: 'most_recent', userId: currentUser.user.id })),
+            dispatch(filterPools({ page: 1, pageSize: 10, term: '', joined: currentUser.user.id, owner: '', closed: '', opened: '', orderBy: 'most_recent', userId: currentUser.user.id })),
+          ]);
+          setMyPools(ownedRes.payload?.Pools?.items || []);
+          setUserJoinedPools(joinedRes.payload?.Pools?.items || []);
+        } catch (e) {
+          console.error(e);
+        } finally {
+          setLoading(false);
+        }
+      }
     };
+    fetchData();
+  }, [currentUser, dispatch]);
 
-    if (!currentUser) {
-        let formatReturnUrl = encodeURIComponent(`${searchParams.pathname}${searchParams.search}`);
-        let returnUrl = `?returnUrl=${formatReturnUrl}`;
-        return <Navigate to={`/login${returnUrl}`} />;
-    }
+  if (!currentUser) {
+    const returnUrl = encodeURIComponent(`${searchParams.pathname}${searchParams.search}`);
+    return <Navigate to={`/login?returnUrl=${returnUrl}`} />;
+  }
 
-    return (
-        <>
-            {loading ? (
-                <div className="d-flex justify-content-center my-5">
-                    <Hourglass
-                        visible={true}
-                        height="80"
-                        width="80"
-                        colors={['#FFD59B', '#FFC371']}
-                    />
+  if (loading) return (
+    <div style={{ display: 'flex', justifyContent: 'center', padding: '100px 0' }}>
+      <Hourglass visible height="72" width="72" colors={['#5D5FEF', '#FF7EB3']} />
+    </div>
+  );
+
+  const totalRaised = myPools.reduce((s, p) => s + parseFloat(p.total_contributed || 0), 0);
+  const totalMembers = myPools.reduce((s, p) => s + (p.members || 0), 0);
+
+  const chartOpts = {
+    chartArea: { width: '82%', height: '72%' },
+    legend: 'none',
+    backgroundColor: 'transparent',
+    colors: ['#5D5FEF'],
+    animation: { startup: true, easing: 'out', duration: 1200 },
+  };
+
+  return (
+    <div style={{ maxWidth: 1280, margin: '0 auto', padding: '32px 24px' }}>
+
+      {/* ── Greeting ── */}
+      <div style={{ marginBottom: 28 }}>
+        <h1 style={{ fontSize: '2rem', fontWeight: 900, color: 'var(--text-dark)', letterSpacing: '-0.03em', marginBottom: 4 }}>
+          Welcome back, {currentUser.user.username} 👋
+        </h1>
+        <p style={{ color: 'var(--text-muted)', fontWeight: 600, margin: 0 }}>
+          Here's what's happening with your pools today.
+        </p>
+      </div>
+
+      {/* ── Stat cards ── */}
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill,minmax(200px,1fr))', gap: 16, marginBottom: 28 }}>
+        <StatCard icon={LuTrendingUp}  label="Total Raised"  value={`$${totalRaised.toLocaleString()}`} color="#5D5FEF" />
+        <StatCard icon={LuDollarSign}  label="My Pools"      value={myPools.length}                     color="#FF7EB3" />
+        <StatCard icon={LuUsers}       label="Total Members" value={totalMembers}                        color="#4ADE80" />
+        <StatCard icon={LuCalendar}    label="Joined Pools"  value={userJoinedPools.length}              color="#FFD363" />
+      </div>
+
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 340px', gap: 24, alignItems: 'start' }}>
+
+        {/* ── LEFT COLUMN ── */}
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>
+
+          {/* Financial Overview */}
+          <div style={{
+            background: 'white', borderRadius: 32,
+            border: '1px solid rgba(0,0,0,0.05)',
+            boxShadow: '0 4px 16px rgba(0,0,0,0.04)',
+            padding: '28px 28px 24px',
+          }}>
+            <h2 style={{ fontSize: '1.25rem', fontWeight: 800, color: 'var(--text-dark)', marginBottom: 24, letterSpacing: '-0.02em' }}>
+              Financial Overview
+            </h2>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 20 }}>
+
+              {/* Monthly */}
+              <div>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 12 }}>
+                  <div style={{ padding: '6px', background: 'rgba(93,95,239,0.1)', borderRadius: 10, color: 'var(--brand-primary)', display: 'flex' }}>
+                    <LuCalendar size={16} />
+                  </div>
+                  <span style={{ fontWeight: 700, fontSize: '0.875rem', color: 'var(--text-dark)' }}>Monthly Contributions</span>
                 </div>
-            ) : (
-                <main className="container-xl my-4 my-md-5">
-                    <div className="row g-4">
-                        {/* Charts Section */}
-                        <div className="col-lg-8">
-                            <div className="glass rounded-2xl border-soft p-4 shadow-soft mb-4">
-                                <h2 className="mb-4 fw-extrabold">Financial Overview</h2>
-                                <div className="row g-4">
-                                    <div className="col-md-6">
-                                        <div className="glass rounded-2xl border-soft p-4 shadow-soft h-100">
-                                            <h5 className="fw-semibold d-flex align-items-center gap-2 mb-3">
-                                                <i className="bi bi-calendar-month text-primary"></i> Monthly Contributions
-                                            </h5>
-                                            <div className="dashboard-graph">
-                                                {monthChart && monthChart.length > 0 ? (
-                                                    <Chart
-                                                        chartType="AreaChart"
-                                                        width="100%"
-                                                        height="300px"
-                                                        data={monthChart}
-                                                        options={{
-                                                            title: "",
-                                                            hAxis: {
-                                                                title: "Month",
-                                                                titleTextStyle: { color: "#6B7280" },
-                                                                textStyle: { color: "#6B7280" }
-                                                            },
-                                                            vAxis: {
-                                                                ticks: monthChartTicks,
-                                                                minValue: 0,
-                                                                textStyle: { color: "#6B7280" }
-                                                            },
-                                                            chartArea: { width: "80%", height: "70%" },
-                                                            colors: ['#C5914B'],
-                                                            legend: "none",
-                                                            lineWidth: 3,
-                                                            animation: {
-                                                                startup: true,
-                                                                easing: "linear",
-                                                                duration: 1500,
-                                                            },
-                                                            backgroundColor: 'transparent',
-                                                        }}
-                                                    />
-                                                ) : (
-                                                    <div className="text-center py-5 text-muted">
-                                                        <i className="bi bi-bar-chart display-4"></i>
-                                                        <p>No monthly data available</p>
-                                                    </div>
-                                                )}
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div className="col-md-6">
-                                        <div className="glass rounded-2xl border-soft p-4 shadow-soft h-100">
-                                            <h5 className="fw-semibold d-flex align-items-center gap-2 mb-3">
-                                                <i className="bi bi-calendar-week text-success"></i> Weekly Comparison
-                                            </h5>
-                                            <div className="dashboard-graph">
-                                                {weekChart && weekChart.length > 0 ? (
-                                                    <Chart
-                                                        chartType="ColumnChart"
-                                                        width="100%"
-                                                        height="300px"
-                                                        data={weekChart}
-                                                        options={{
-                                                            title: "",
-                                                            chartArea: { width: "80%", height: "70%" },
-                                                            isStacked: true,
-                                                            legend: "none",
-                                                            bar: { groupWidth: "60%" },
-                                                            hAxis: {
-                                                                title: "Week",
-                                                                minValue: 0,
-                                                                textStyle: { color: "#6B7280" }
-                                                            },
-                                                            vAxis: {
-                                                                title: "Contributed",
-                                                                ticks: weekChartTicks,
-                                                                minValue: 0,
-                                                                textStyle: { color: "#6B7280" }
-                                                            },
-                                                            colors: ['#FFC371', '#FF796E'],
-                                                            animation: {
-                                                                startup: true,
-                                                                easing: "linear",
-                                                                duration: 1500,
-                                                            },
-                                                            backgroundColor: 'transparent',
-                                                        }}
-                                                    />
-                                                ) : (
-                                                    <div className="text-center py-5 text-muted">
-                                                        <i className="bi bi-bar-chart display-4"></i>
-                                                        <p>No weekly data available</p>
-                                                    </div>
-                                                )}
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
+                {monthChart?.length > 0 ? (
+                  <Chart chartType="AreaChart" width="100%" height="240px" data={monthChart}
+                    options={{ ...chartOpts, hAxis: { title: 'Month', textStyle: { color: '#6B7280' }, titleTextStyle: { color: '#6B7280' } }, vAxis: { ticks: monthChartTicks, minValue: 0, textStyle: { color: '#6B7280' } }, lineWidth: 2.5 }}
+                  />
+                ) : (
+                  <div style={{ height: 240, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', color: 'var(--text-muted)', gap: 8 }}>
+                    <LuTrendingUp size={36} style={{ opacity: 0.3 }} />
+                    <span style={{ fontSize: '0.82rem', fontWeight: 600 }}>No monthly data yet</span>
+                  </div>
+                )}
+              </div>
 
-                            {/* My Pools Section */}
-                            <div className="glass rounded-2xl border-soft p-4 shadow-soft mb-4">
-                                <div className="d-flex justify-content-between align-items-center mb-4">
-                                    <h2 className="fw-extrabold mb-0">My Pools</h2>
-                                    <Link className="btn btn-outline-primary rounded-xl" to={"/pools"}>
-                                        See all <i className="bi bi-arrow-right ms-1"></i>
-                                    </Link>
-                                </div>
-                                <div className="row g-4">
-                                    {myPools.length > 0 ? (
-                                        myPools.slice(0, 2).map(pool => (
-                                            <div key={pool.id} className="col-md-6">
-                                                <div className="glass-card rounded-xl border-soft p-4 h-100 d-flex flex-column">
-                                                    {/* Pool Image and Header */}
-                                                    <div className="d-flex align-items-start gap-3 mb-3">
-                                                        <img
-                                                            src={pool.photo || "https://via.placeholder.com/60"}
-                                                            alt={pool.name}
-                                                            className="rounded-xl"
-                                                            style={{
-                                                                width: "60px",
-                                                                height: "60px",
-                                                                objectFit: "cover"
-                                                            }}
-                                                        />
-                                                        <div className="flex-grow-1">
-                                                            <div className="d-flex justify-content-between align-items-start">
-                                                                <h5 className="fw-bold text-truncate mb-1" style={{ maxWidth: 150 }}>{pool.name}</h5>
-                                                                <span className={`badge rounded-pill ${pool.status === 1 ? 'bg-success' : 'bg-secondary'}`}>
-                                                                    {pool.status === 1 ? 'Active' : 'Closed'}
-                                                                </span>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                    <p className="text-muted small mb-0">By {pool.poolOwner?.username || 'Unknown'}</p>
+              {/* Weekly */}
+              <div>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 12 }}>
+                  <div style={{ padding: '6px', background: 'rgba(74,222,128,0.1)', borderRadius: 10, color: '#4ADE80', display: 'flex' }}>
+                    <LuTrendingUp size={16} />
+                  </div>
+                  <span style={{ fontWeight: 700, fontSize: '0.875rem', color: 'var(--text-dark)' }}>Weekly Comparison</span>
+                </div>
+                {weekChart?.length > 0 ? (
+                  <Chart chartType="ColumnChart" width="100%" height="240px" data={weekChart}
+                    options={{ ...chartOpts, colors: ['#5D5FEF', '#FF7EB3'], hAxis: { textStyle: { color: '#6B7280' } }, vAxis: { ticks: weekChartTicks, minValue: 0, textStyle: { color: '#6B7280' } }, bar: { groupWidth: '55%' } }}
+                  />
+                ) : (
+                  <div style={{ height: 240, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', color: 'var(--text-muted)', gap: 8 }}>
+                    <LuTrendingUp size={36} style={{ opacity: 0.3 }} />
+                    <span style={{ fontSize: '0.82rem', fontWeight: 600 }}>No weekly data yet</span>
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
 
-                                                    <div className="d-flex justify-content-between align-items-center mt-2">
-                                                        <div className="d-flex align-items-center">
-                                                            <i className="bi bi-people-fill me-2 text-warning"></i>
-                                                            <small>{pool.members || 0} members</small>
-                                                        </div>
-                                                        <div className="d-flex align-items-center">
-                                                            <i className="bi bi-currency-dollar me-2 text-success"></i>
-                                                            <small>${pool.total_contributed || 0}</small>
-                                                        </div>
-                                                    </div>
-                                                    <div className="progress mb-2" style={{ height: '4px' }}>
-                                                        <CustomProgressBar progressPercentage={pool.goal_percentage || 0} />
-                                                    </div>
-                                                    <div className="d-flex justify-content-between mt-2">
-                                                        <small className="text-muted">${pool.total_contributed || 0} collected</small>
-                                                        <small className="text-muted">${pool.goal_amount || 0} goal</small>
-                                                    </div>
-                                                    <div className="mt-3">
-                                                        <Link
-                                                            to={`/pool-details?id=${pool.id}`}
-                                                            className="btn btn-outline-primary btn-sm w-100 rounded-xl"
-                                                        >
-                                                            View Details
-                                                        </Link>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        ))
-                                    ) : (
-                                        <div className="col-12 text-center py-4">
-                                            <i className="bi bi-inbox display-4 text-muted"></i>
-                                            <p className="text-muted mt-2">You haven't created any pools yet.</p>
-                                            <Link to="/pool-create" className="btn btn-primary rounded-xl mt-2">
-                                                Create Your First Pool
-                                            </Link>
-                                        </div>
-                                    )}
-                                </div>
-                            </div>
+          {/* My Pools */}
+          <div style={{
+            background: 'white', borderRadius: 32,
+            border: '1px solid rgba(0,0,0,0.05)',
+            boxShadow: '0 4px 16px rgba(0,0,0,0.04)',
+            padding: '24px 28px',
+          }}>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 20 }}>
+              <h2 style={{ fontSize: '1.25rem', fontWeight: 800, color: 'var(--text-dark)', margin: 0, letterSpacing: '-0.02em' }}>My Pools</h2>
+              <Link to="/pools" style={{
+                display: 'flex', alignItems: 'center', gap: 6,
+                padding: '7px 14px',
+                border: '1.5px solid rgba(93,95,239,0.25)',
+                borderRadius: 10,
+                color: 'var(--brand-primary)',
+                fontWeight: 700, fontSize: '0.8rem',
+                textDecoration: 'none',
+              }}>
+                See all <LuExternalLink size={13} />
+              </Link>
+            </div>
+
+            {myPools.length > 0 ? (
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill,minmax(260px,1fr))', gap: 16 }}>
+                {myPools.slice(0, 4).map(pool => (
+                  <div key={pool.id} style={{
+                    background: 'var(--surface)',
+                    borderRadius: 20, border: '1px solid var(--border-color)',
+                    padding: '18px',
+                    display: 'flex', flexDirection: 'column', gap: 12,
+                  }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+                      <img src={pool.photo || "/assets/img/pool-thumbnails/pool-2.png"} alt={pool.name}
+                        style={{ width: 48, height: 48, borderRadius: 14, objectFit: 'cover', flexShrink: 0 }} />
+                      <div style={{ flex: 1, minWidth: 0 }}>
+                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 6 }}>
+                          <h4 style={{ fontWeight: 800, fontSize: '0.9rem', color: 'var(--text-dark)', margin: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                            {pool.name}
+                          </h4>
+                          <span style={{
+                            padding: '3px 8px',
+                            background: pool.status === 1 ? 'rgba(74,222,128,0.15)' : 'rgba(239,68,68,0.1)',
+                            color: pool.status === 1 ? '#16a34a' : '#dc2626',
+                            borderRadius: 99, fontSize: '9px', fontWeight: 800,
+                            textTransform: 'uppercase', letterSpacing: '0.08em', flexShrink: 0,
+                          }}>
+                            {pool.status === 1 ? 'Active' : 'Closed'}
+                          </span>
                         </div>
-
-                        {/* Right Sidebar */}
-                        <div className="col-lg-4">
-                            {/* Joined Pools Section */}
-                            <div className="glass rounded-2xl border-soft p-4 shadow-soft mb-4">
-                                <div className="d-flex justify-content-between align-items-center mb-4">
-                                    <h2 className="fw-extrabold mb-0">Joined Pools</h2>
-                                    <Link className="btn btn-outline-primary rounded-xl" to={"/pools"}>
-                                        See all <i className="bi bi-arrow-right ms-1"></i>
-                                    </Link>
-                                </div>
-                                {userJoinedPools.length > 0 ? (
-                                    userJoinedPools.slice(0, 2).map(pool => (
-                                        <div key={pool.id} className="mb-3">
-                                            <div className="glass-card rounded-xl border-soft p-3">
-                                                {/* Pool Image and Header */}
-                                                <div className="d-flex align-items-start gap-3 mb-2">
-                                                    <img
-                                                        src={pool.photo || "https://via.placeholder.com/50"}
-                                                        alt={pool.name}
-                                                        className="rounded-xl"
-                                                        style={{
-                                                            width: "50px",
-                                                            height: "50px",
-                                                            objectFit: "cover"
-                                                        }}
-                                                    />
-                                                    <div className="flex-grow-1">
-                                                        <div className="d-flex justify-content-between align-items-start">
-                                                            <h6 className="fw-semibold text-truncate mb-1" style={{ maxWidth: 200 }}>{pool.name}</h6>
-                                                            <span className={`badge rounded-pill ${pool.status === 1 ? 'bg-success' : 'bg-secondary'}`}>
-                                                                {pool.status === 1 ? 'Active' : 'Closed'}
-                                                            </span>
-                                                        </div>
-                                                        <p className="text-muted small mb-0">By {pool.poolOwner?.username || 'Unknown'}</p>
-                                                    </div>
-                                                </div>
-
-                                                <div className="d-flex justify-content-between align-items-center mb-2">
-                                                    <div className="d-flex align-items-center">
-                                                        <i className="bi bi-currency-dollar me-1 text-success small"></i>
-                                                        <small>${pool.total_contributed || 0} of ${pool.goal_amount || 0}</small>
-                                                    </div>
-                                                    <div className="d-flex align-items-center">
-                                                        <i className="bi bi-people-fill me-1 text-primary small"></i>
-                                                        <small>{pool.members || 0}</small>
-                                                    </div>
-                                                </div>
-                                                <div className="progress mb-2" style={{ height: '4px' }}>
-                                                    <CustomProgressBar progressPercentage={pool.goal_percentage || 0} />
-                                                </div>
-                                                <div className="d-flex justify-content-between align-items-center">
-                                                    <span className="badge bg-light text-dark small">
-                                                        <TimeAgo date={convertUTCDateToLocalDate(new Date(pool.createdAt))} />
-                                                    </span>
-                                                    <Link to={`/pool-details?id=${pool.id}`} className="btn btn-sm btn-outline-secondary rounded-xl">
-                                                        View
-                                                    </Link>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    ))
-                                ) : (
-                                    <div className="text-center py-3">
-                                        <i className="bi bi-people display-5 text-muted"></i>
-                                        <p className="text-muted mt-2">You haven't joined any pools yet.</p>
-                                        <Link to="/pools" className="btn btn-outline-primary btn-sm rounded-xl">
-                                            Explore Pools
-                                        </Link>
-                                    </div>
-                                )}
-                            </div>
-
-                            {/* Quick Actions */}
-                            <div className="glass rounded-2xl border-soft p-4 shadow-soft mt-4">
-                                <h5 className="fw-semibold d-flex align-items-center gap-2 mb-3">
-                                    <i className="bi bi-lightning-fill text-warning"></i> Quick Actions
-                                </h5>
-                                <div className="d-grid gap-2">
-                                    <Link to="/pool-create" className="btn btn-primary rounded-xl">
-                                        <i className="bi bi-plus-circle me-2"></i> Create New Pool
-                                    </Link>
-                                    <Link to="/pools" className="btn btn-outline-secondary rounded-xl">
-                                        <i className="bi bi-search me-2"></i> Explore Pools
-                                    </Link>
-                                </div>
-                            </div>
-                        </div>
+                        <p style={{ fontSize: '0.72rem', color: 'var(--text-muted)', fontWeight: 600, margin: 0 }}>
+                          By {pool.poolOwner?.username || 'Unknown'}
+                        </p>
+                      </div>
                     </div>
-                </main>
+
+                    <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.78rem', fontWeight: 600 }}>
+                      <span style={{ display: 'flex', alignItems: 'center', gap: 4, color: 'var(--text-muted)' }}>
+                        <LuUsers size={13} style={{ color: 'var(--brand-yellow)' }} /> {pool.members || 0} members
+                      </span>
+                      <span style={{ display: 'flex', alignItems: 'center', gap: 4, color: 'var(--text-muted)' }}>
+                        <LuDollarSign size={13} style={{ color: 'var(--brand-green)' }} /> ${pool.total_contributed || 0}
+                      </span>
+                    </div>
+
+                    <MiniProgress pct={pool.goal_percentage || 0} />
+
+                    <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.72rem', color: 'var(--text-muted)', fontWeight: 600 }}>
+                      <span>${pool.total_contributed || 0} raised</span>
+                      <span>${pool.goal_amount || 0} goal</span>
+                    </div>
+
+                    <Link to={`/pool-details?id=${pool.id}`} style={{
+                      display: 'block', textAlign: 'center',
+                      padding: '9px',
+                      background: 'white',
+                      border: '1.5px solid var(--border-color)',
+                      borderRadius: 12,
+                      color: 'var(--text-dark)',
+                      fontWeight: 700, fontSize: '0.82rem',
+                      textDecoration: 'none',
+                      transition: 'border-color 0.2s, color 0.2s',
+                    }}
+                      onMouseEnter={(e) => { e.currentTarget.style.borderColor = 'var(--brand-primary)'; e.currentTarget.style.color = 'var(--brand-primary)'; }}
+                      onMouseLeave={(e) => { e.currentTarget.style.borderColor = 'var(--border-color)'; e.currentTarget.style.color = 'var(--text-dark)'; }}
+                    >
+                      View Details
+                    </Link>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <div style={{ textAlign: 'center', padding: '40px 0', color: 'var(--text-muted)' }}>
+                <LuSearch size={40} style={{ opacity: 0.25, marginBottom: 12 }} />
+                <p style={{ fontWeight: 600, marginBottom: 16 }}>You haven't created any pools yet.</p>
+                <Link to="/pool-create" style={{
+                  display: 'inline-flex', alignItems: 'center', gap: 6,
+                  padding: '10px 20px',
+                  background: 'var(--brand-primary)',
+                  color: 'white', borderRadius: 12,
+                  fontWeight: 800, fontSize: '0.85rem', textDecoration: 'none',
+                }}>
+                  <LuPlus size={15} strokeWidth={3} /> Create Your First Pool
+                </Link>
+              </div>
             )}
-        </>
-    );
+          </div>
+        </div>
+
+        {/* ── RIGHT COLUMN ── */}
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
+
+          {/* Joined Pools */}
+          <div style={{
+            background: 'white', borderRadius: 32,
+            border: '1px solid rgba(0,0,0,0.05)',
+            boxShadow: '0 4px 16px rgba(0,0,0,0.04)',
+            padding: '24px',
+          }}>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 18 }}>
+              <h2 style={{ fontSize: '1.1rem', fontWeight: 800, color: 'var(--text-dark)', margin: 0 }}>Joined Pools</h2>
+              <Link to="/pools" style={{
+                padding: '4px 12px',
+                border: '1.5px solid rgba(93,95,239,0.25)',
+                borderRadius: 99, color: 'var(--brand-primary)',
+                fontWeight: 700, fontSize: '0.72rem',
+                textDecoration: 'none',
+              }}>
+                See all
+              </Link>
+            </div>
+
+            {userJoinedPools.length > 0 ? (
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+                {userJoinedPools.slice(0, 4).map(pool => (
+                  <div key={pool.id} style={{
+                    display: 'flex', alignItems: 'center', gap: 12,
+                    padding: '12px',
+                    borderRadius: 16,
+                    border: '1px solid transparent',
+                    transition: 'background 0.15s, border-color 0.15s',
+                    cursor: 'default',
+                  }}
+                    onMouseEnter={(e) => { e.currentTarget.style.background = 'var(--surface)'; e.currentTarget.style.borderColor = 'var(--border-color)'; }}
+                    onMouseLeave={(e) => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.borderColor = 'transparent'; }}
+                  >
+                    <img src={pool.photo || "/assets/img/pool-thumbnails/pool-2.png"} alt={pool.name}
+                      style={{ width: 50, height: 50, borderRadius: 14, objectFit: 'cover', flexShrink: 0 }} />
+                    <div style={{ flex: 1, minWidth: 0 }}>
+                      <h4 style={{ fontWeight: 800, fontSize: '0.85rem', color: 'var(--text-dark)', margin: '0 0 2px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                        {pool.name}
+                      </h4>
+                      <p style={{ fontSize: '0.72rem', color: 'var(--text-muted)', fontWeight: 600, margin: '0 0 4px' }}>
+                        By {pool.poolOwner?.username || 'Unknown'}
+                      </p>
+                      <p style={{ fontSize: '0.68rem', color: 'var(--text-muted)', fontWeight: 500, margin: 0 }}>
+                        <TimeAgo date={convertUTCDateToLocalDate(new Date(pool.createdAt))} />
+                      </p>
+                    </div>
+                    <Link to={`/pool-details?id=${pool.id}`} style={{
+                      padding: '6px 12px',
+                      background: 'var(--surface)',
+                      border: '1px solid var(--border-color)',
+                      borderRadius: 9,
+                      color: 'var(--text-dark)',
+                      fontWeight: 700, fontSize: '0.75rem',
+                      textDecoration: 'none', flexShrink: 0,
+                      transition: 'border-color 0.15s',
+                    }}
+                      onMouseEnter={(e) => (e.currentTarget.style.borderColor = 'var(--brand-primary)')}
+                      onMouseLeave={(e) => (e.currentTarget.style.borderColor = 'var(--border-color)')}
+                    >
+                      View
+                    </Link>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <div style={{ textAlign: 'center', padding: '28px 0', color: 'var(--text-muted)' }}>
+                <LuUsers size={32} style={{ opacity: 0.25, marginBottom: 10 }} />
+                <p style={{ fontWeight: 600, fontSize: '0.85rem', marginBottom: 14 }}>You haven't joined any pools yet.</p>
+                <Link to="/pools" style={{
+                  display: 'inline-flex', alignItems: 'center', gap: 6,
+                  padding: '8px 18px',
+                  border: '1.5px solid var(--border-color)',
+                  borderRadius: 10,
+                  color: 'var(--text-dark)',
+                  fontWeight: 700, fontSize: '0.82rem',
+                  textDecoration: 'none',
+                }}>
+                  Explore Pools
+                </Link>
+              </div>
+            )}
+          </div>
+
+          {/* Quick Actions */}
+          <div style={{
+            background: 'white', borderRadius: 32,
+            border: '1px solid rgba(0,0,0,0.05)',
+            boxShadow: '0 4px 16px rgba(0,0,0,0.04)',
+            padding: '24px',
+          }}>
+            <h3 style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: '1rem', fontWeight: 800, color: 'var(--text-dark)', margin: '0 0 16px' }}>
+              <LuZap size={18} style={{ color: 'var(--brand-yellow)' }} /> Quick Actions
+            </h3>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+              <Link to="/pool-create" style={{
+                display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
+                padding: '14px',
+                background: 'var(--brand-primary)',
+                color: 'white', borderRadius: 18,
+                fontWeight: 800, fontSize: '0.9rem',
+                textDecoration: 'none',
+                boxShadow: '0 8px 20px rgba(93,95,239,0.28)',
+                transition: 'transform 0.15s, box-shadow 0.15s',
+              }}
+                onMouseEnter={(e) => { e.currentTarget.style.transform = 'scale(1.02)'; }}
+                onMouseLeave={(e) => { e.currentTarget.style.transform = 'scale(1)'; }}
+              >
+                <LuPlus size={18} strokeWidth={3} /> Create New Pool
+              </Link>
+              <Link to="/pools" style={{
+                display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
+                padding: '14px',
+                background: 'var(--surface)',
+                color: 'var(--text-dark)',
+                border: '1px solid var(--border-color)',
+                borderRadius: 18,
+                fontWeight: 800, fontSize: '0.9rem',
+                textDecoration: 'none',
+                transition: 'background 0.15s',
+              }}
+                onMouseEnter={(e) => (e.currentTarget.style.background = '#e8eaf0')}
+                onMouseLeave={(e) => (e.currentTarget.style.background = 'var(--surface)')}
+              >
+                <LuSearch size={18} /> Explore Pools
+              </Link>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
 };
 
 export default Dashboard;

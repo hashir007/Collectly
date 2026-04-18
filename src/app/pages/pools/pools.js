@@ -4,17 +4,14 @@ import { Navigate, Link } from "react-router-dom";
 import { filterPools } from "../../slices/pool";
 import { Hourglass } from 'react-loader-spinner';
 import {
-  FiSearch,
-  FiPlus,
-  FiFilter,
-  FiUsers,
-  FiUser,
-  FiGlobe,
-  FiClock,
-  FiAward,
-  FiDollarSign
-} from 'react-icons/fi';
-import { TbArrowsSort } from 'react-icons/tb';
+  LuSearch,
+  LuPlus,
+  LuSlidersHorizontal,
+  LuUsers,
+  LuClock,
+  LuArrowUpDown,
+  LuX,
+} from 'react-icons/lu';
 import Pool from "../../components/pool/pool";
 
 const Pools = () => {
@@ -27,7 +24,6 @@ const Pools = () => {
   const [showFilters, setShowFilters] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
 
-  // Store all filters in state
   const [filters, setFilters] = useState({
     term: '',
     joined: '',
@@ -37,17 +33,13 @@ const Pools = () => {
     orderBy: 'most_recent'
   });
 
-  // Initial load
   useEffect(() => {
     if (currentUser) {
       setPoolLoading(true);
       setCurrentPage(1);
-
-      const pageSize = 10;
-
       dispatch(filterPools({
         page: 1,
-        pageSize,
+        pageSize: 10,
         term: filters.term,
         joined: filters.joined,
         owner: filters.owner,
@@ -55,47 +47,24 @@ const Pools = () => {
         opened: filters.opened,
         orderBy: filters.orderBy,
         userId: currentUser.user.id
-      })).finally(() => {
-        setPoolLoading(false);
-      });
+      })).finally(() => setPoolLoading(false));
     }
   }, [currentUser, dispatch, filters]);
 
-  const handleFilterTab = (tabs) => {
-    const newFilters = { ...filters };
-
-    if (tabs === 1) {
-      // My Joined Pools - only joined has user ID
-      newFilters.joined = currentUser.user.id;
-      newFilters.owner = '';
-    } else if (tabs === 2) {
-      // My Pools - only owner has user ID
-      newFilters.owner = currentUser.user.id;
-      newFilters.joined = '';
-    } else if (tabs === 3) {
-      // All Pools - CLEAR both filters (don't set to user ID)
-      newFilters.joined = '';
-      newFilters.owner = '';
-    }
-
-    setFilters(newFilters);
+  const handleFilterTab = (tab) => {
+    const nf = { ...filters };
+    if (tab === 1)      { nf.joined = currentUser.user.id; nf.owner = ''; }
+    else if (tab === 2) { nf.owner = currentUser.user.id;  nf.joined = ''; }
+    else                { nf.joined = ''; nf.owner = ''; }
+    setFilters(nf);
     setCurrentPage(1);
   };
 
-  const handleSubFilterTab = (subTabs) => {
-    const newFilters = { ...filters };
-
-    if (subTabs === 1) {
-      // Toggle closed filter
-      newFilters.closed = newFilters.closed ? '' : '1';
-      newFilters.opened = '';
-    } else if (subTabs === 2) {
-      // Toggle opened filter
-      newFilters.opened = newFilters.opened ? '' : '1';
-      newFilters.closed = '';
-    }
-
-    setFilters(newFilters);
+  const handleSubFilterTab = (sub) => {
+    const nf = { ...filters };
+    if (sub === 1)      { nf.closed = nf.closed ? '' : '1'; nf.opened = ''; }
+    else if (sub === 2) { nf.opened = nf.opened ? '' : '1'; nf.closed = ''; }
+    setFilters(nf);
     setCurrentPage(1);
   };
 
@@ -111,67 +80,16 @@ const Pools = () => {
     }
   };
 
-  const PoolFiltersSection = useCallback(() => {
-    // Helper function to determine active tabs
-    const isAllPoolsActive = !filters.joined && !filters.owner;
-    const isJoinedPoolsActive = filters.joined && !filters.owner;
-    const isMyPoolsActive = !filters.joined && filters.owner;
-
-    return (
-      <div className="glass rounded-2xl border-soft p-4 shadow-soft mb-4" style={{
-        position: 'relative'
-      }}>
-        <div className="row g-3">
-          <div className="col-md-6">
-            <h5 className="fw-semibold d-flex align-items-center gap-2 mb-3">
-              <FiUsers className="text-primary" /> Pool Type
-            </h5>
-            <div className="d-flex flex-wrap gap-2">
-              <button
-                className={`btn btn-sm ${isAllPoolsActive ? 'btn-primary' : 'btn-outline-secondary'} rounded-xl`}
-                onClick={() => handleFilterTab(3)}>
-                All Pools
-              </button>
-              <button
-                className={`btn btn-sm ${isJoinedPoolsActive ? 'btn-primary' : 'btn-outline-secondary'} rounded-xl`}
-                onClick={() => handleFilterTab(1)}>
-                My Joined Pools
-              </button>
-              <button
-                className={`btn btn-sm ${isMyPoolsActive ? 'btn-primary' : 'btn-outline-secondary'} rounded-xl`}
-                onClick={() => handleFilterTab(2)}>
-                My Pools
-              </button>
-            </div>
-          </div>
-
-          <div className="col-md-6">
-            <h5 className="fw-semibold d-flex align-items-center gap-2 mb-3">
-              <FiClock className="text-primary" /> Status
-            </h5>
-            <div className="d-flex flex-wrap gap-2">
-              <button
-                className={`btn btn-sm ${filters.opened === '1' ? 'btn-primary' : 'btn-outline-secondary'} rounded-xl`}
-                onClick={() => handleSubFilterTab(2)}>
-                Open
-              </button>
-              <button
-                className={`btn btn-sm ${filters.closed === '1' ? 'btn-primary' : 'btn-outline-secondary'} rounded-xl`}
-                onClick={() => handleSubFilterTab(1)}>
-                Closed
-              </button>
-            </div>
-          </div>
-        </div>
-      </div>
-    );
-  }, [filters, currentUser]);
+  const clearAllFilters = () => {
+    setFilters({ term: '', joined: '', owner: '', closed: '', opened: '', orderBy: 'most_recent' });
+    setSearchInput('');
+    setCurrentPage(1);
+  };
 
   const handleLoadMore = () => {
     if (pools.total > currentPage * pools.pageSize) {
       setLoadMoreLoading(true);
       const nextPage = currentPage + 1;
-
       dispatch(filterPools({
         page: nextPage,
         pageSize: parseInt(pools.pageSize),
@@ -182,28 +100,16 @@ const Pools = () => {
         opened: filters.opened,
         orderBy: filters.orderBy,
         userId: currentUser.user.id
-      })).then(() => {
-        setCurrentPage(nextPage);
-        setLoadMoreLoading(false);
-      }).catch(() => {
-        setLoadMoreLoading(false);
-      });
+      })).then(() => { setCurrentPage(nextPage); setLoadMoreLoading(false); })
+        .catch(() => setLoadMoreLoading(false));
     }
   };
 
-  // Clear all filters
-  const clearAllFilters = () => {
-    setFilters({
-      term: '',
-      joined: '',
-      owner: '',
-      closed: '',
-      opened: '',
-      orderBy: 'most_recent'
-    });
-    setSearchInput('');
-    setCurrentPage(1);
-  };
+  const isAllPoolsActive    = !filters.joined && !filters.owner;
+  const isJoinedPoolsActive = !!filters.joined && !filters.owner;
+  const isMyPoolsActive     = !filters.joined && !!filters.owner;
+
+  const sortLabels = { most_recent: 'Most Recent', name: 'Pool Name', most_funded: 'Most Funded' };
 
   if (!currentUser) {
     const formatReturnUrl = encodeURIComponent(`${window.location.pathname}${window.location.search}`);
@@ -211,145 +117,323 @@ const Pools = () => {
   }
 
   return (
-    <div className="container-xl my-4 my-md-5">
-      <div className="glass rounded-2xl border-soft p-4 shadow-soft mb-4" style={{
-        position: 'relative',
-        zIndex: 1,
-        isolation: 'isolate'
-      }}>
-        <div className="d-flex flex-column flex-md-row align-items-center justify-content-between gap-3">
-          <div className="flex-grow-1">
-            <div className="input-group">
-              <span className="input-group-text bg-transparent">
-                <FiSearch />
-              </span>
-              <input
-                type="text"
-                className="form-control"
-                placeholder="Search pools..."
-                value={searchInput}
-                onChange={(e) => setSearchInput(e.target.value)}
-                onKeyDown={handleSearch}
-              />
-            </div>
-          </div>
+    <div style={{ maxWidth: 1280, margin: '0 auto', padding: '32px 24px' }}>
 
-          <div className="d-flex align-items-center gap-2">
-            <div className="dropdown">
-              <button
-                className="btn btn-outline-secondary btn-sm rounded-xl dropdown-toggle d-flex align-items-center gap-1"
-                onClick={() => setShowFilters(!showFilters)}
-              >
-                <FiFilter />
-                Filters
-              </button>
-            </div>
-
-            <div className="dropdown">
-              <button
-                className="btn btn-outline-secondary btn-sm rounded-xl dropdown-toggle d-flex align-items-center gap-1"
-                data-bs-toggle="dropdown"
-                aria-expanded="false"
-              >
-                <TbArrowsSort />
-                Sort
-              </button>
-              <ul className="dropdown-menu dropdown-menu-end">
-                <li>
-                  <button
-                    className={`dropdown-item ${filters.orderBy === 'most_recent' ? 'active' : ''}`}
-                    onClick={() => handleSort('most_recent')}
-                  >
-                    Most Recent
-                  </button>
-                </li>
-                <li>
-                  <button
-                    className={`dropdown-item ${filters.orderBy === 'name' ? 'active' : ''}`}
-                    onClick={() => handleSort('name')}
-                  >
-                    Pool Name
-                  </button>
-                </li>
-                <li>
-                  <button
-                    className={`dropdown-item ${filters.orderBy === 'most_funded' ? 'active' : ''}`}
-                    onClick={() => handleSort('most_funded')}
-                  >
-                    Most Funded
-                  </button>
-                </li>
-              </ul>
-            </div>
-
-            <Link
-              to="/pool-create"
-              className="btn btn-primary btn-sm rounded-xl d-flex align-items-center gap-1"
-            >
-              <FiPlus />
-              Create Pool
-            </Link>
-          </div>
-        </div>
+      {/* ── Page header ── */}
+      <div style={{ marginBottom: 28 }}>
+        <h1 style={{ fontSize: '2rem', fontWeight: 900, color: 'var(--text-dark)', letterSpacing: '-0.03em', marginBottom: 4 }}>
+          Browse Pools
+        </h1>
+        <p style={{ color: 'var(--text-muted)', fontWeight: 600, margin: 0 }}>
+          Discover community pools, join causes you care about, or start your own.
+        </p>
       </div>
 
-      {showFilters && <PoolFiltersSection />}
-
-      {poolLoading ? (
-        <div className="d-flex justify-content-center my-5">
-          <Hourglass
-            visible={true}
-            height="80"
-            width="80"
-            colors={['#FFD59B', '#FFC371']}
+      {/* ── Search + controls ── */}
+      <div style={{
+        background: 'white',
+        borderRadius: 24,
+        border: '1px solid var(--border-color)',
+        boxShadow: 'var(--shadow-sm)',
+        padding: '16px 20px',
+        marginBottom: 16,
+        display: 'flex',
+        flexWrap: 'wrap',
+        alignItems: 'center',
+        gap: 12,
+      }}>
+        {/* Search input */}
+        <div style={{ flex: '1 1 240px', position: 'relative' }}>
+          <LuSearch size={18} style={{
+            position: 'absolute', left: 14, top: '50%', transform: 'translateY(-50%)',
+            color: 'var(--text-muted)', pointerEvents: 'none'
+          }} />
+          <input
+            type="text"
+            placeholder="Search pools…"
+            value={searchInput}
+            onChange={(e) => setSearchInput(e.target.value)}
+            onKeyDown={handleSearch}
+            style={{
+              width: '100%',
+              padding: '11px 14px 11px 42px',
+              border: '1.5px solid var(--border-color)',
+              borderRadius: 14,
+              background: 'var(--surface)',
+              fontSize: '0.875rem',
+              fontWeight: 600,
+              color: 'var(--text-dark)',
+              outline: 'none',
+              transition: 'border-color 0.2s, box-shadow 0.2s',
+            }}
+            onFocus={(e) => {
+              e.target.style.borderColor = 'var(--brand-primary)';
+              e.target.style.boxShadow = '0 0 0 3px rgba(93,95,239,0.12)';
+            }}
+            onBlur={(e) => {
+              e.target.style.borderColor = 'var(--border-color)';
+              e.target.style.boxShadow = 'none';
+            }}
           />
+        </div>
+
+        {/* Filter toggle */}
+        <button
+          onClick={() => setShowFilters(!showFilters)}
+          style={{
+            display: 'flex', alignItems: 'center', gap: 6,
+            padding: '10px 16px',
+            border: `1.5px solid ${showFilters ? 'var(--brand-primary)' : 'var(--border-color)'}`,
+            borderRadius: 12,
+            background: showFilters ? 'var(--brand-primary-light)' : 'white',
+            color: showFilters ? 'var(--brand-primary)' : 'var(--text-muted)',
+            fontSize: '0.85rem', fontWeight: 700, cursor: 'pointer',
+            transition: 'all 0.2s',
+          }}
+        >
+          <LuSlidersHorizontal size={16} />
+          Filters
+        </button>
+
+        {/* Sort dropdown */}
+        <div className="dropdown">
+          <button
+            className="dropdown-toggle"
+            data-bs-toggle="dropdown"
+            style={{
+              display: 'flex', alignItems: 'center', gap: 6,
+              padding: '10px 16px',
+              border: '1.5px solid var(--border-color)',
+              borderRadius: 12,
+              background: 'white',
+              color: 'var(--text-muted)',
+              fontSize: '0.85rem', fontWeight: 700, cursor: 'pointer',
+            }}
+          >
+            <LuArrowUpDown size={16} />
+            {sortLabels[filters.orderBy]}
+          </button>
+          <ul className="dropdown-menu dropdown-menu-end" style={{ borderRadius: 14, border: '1px solid var(--border-color)', padding: '6px' }}>
+            {Object.entries(sortLabels).map(([val, label]) => (
+              <li key={val}>
+                <button
+                  className="dropdown-item"
+                  onClick={() => handleSort(val)}
+                  style={{
+                    borderRadius: 10, fontWeight: 600, fontSize: '0.85rem',
+                    color: filters.orderBy === val ? 'var(--brand-primary)' : 'var(--text-dark)',
+                    background: filters.orderBy === val ? 'var(--brand-primary-light)' : 'transparent',
+                  }}
+                >
+                  {label}
+                </button>
+              </li>
+            ))}
+          </ul>
+        </div>
+
+        {/* Create pool */}
+        <Link
+          to="/pool-create"
+          style={{
+            display: 'flex', alignItems: 'center', gap: 6,
+            padding: '10px 18px',
+            background: 'var(--brand-primary)',
+            color: 'white',
+            borderRadius: 12,
+            fontWeight: 800, fontSize: '0.85rem',
+            textDecoration: 'none',
+            boxShadow: '0 4px 14px rgba(93,95,239,0.25)',
+            transition: 'transform 0.15s, box-shadow 0.15s',
+          }}
+          onMouseEnter={(e) => { e.currentTarget.style.transform = 'scale(1.02)'; }}
+          onMouseLeave={(e) => { e.currentTarget.style.transform = 'scale(1)'; }}
+        >
+          <LuPlus size={16} strokeWidth={3} />
+          Create Pool
+        </Link>
+      </div>
+
+      {/* ── Filters panel ── */}
+      {showFilters && (
+        <div style={{
+          background: 'white',
+          borderRadius: 20,
+          border: '1px solid var(--border-color)',
+          boxShadow: 'var(--shadow-sm)',
+          padding: '20px 24px',
+          marginBottom: 16,
+          display: 'flex',
+          flexWrap: 'wrap',
+          gap: 32,
+        }}>
+          <div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 10 }}>
+              <LuUsers size={16} style={{ color: 'var(--brand-primary)' }} />
+              <span style={{ fontWeight: 800, fontSize: '0.8rem', textTransform: 'uppercase', letterSpacing: '0.08em', color: 'var(--text-dark)' }}>Pool Type</span>
+            </div>
+            <div style={{ display: 'flex', gap: 8 }}>
+              {[
+                { label: 'All Pools', tab: 3, active: isAllPoolsActive },
+                { label: 'Joined', tab: 1, active: isJoinedPoolsActive },
+                { label: 'My Pools', tab: 2, active: isMyPoolsActive },
+              ].map(({ label, tab, active }) => (
+                <button
+                  key={label}
+                  onClick={() => handleFilterTab(tab)}
+                  style={{
+                    padding: '7px 14px',
+                    border: `1.5px solid ${active ? 'var(--brand-primary)' : 'var(--border-color)'}`,
+                    borderRadius: 10,
+                    background: active ? 'var(--brand-primary)' : 'white',
+                    color: active ? 'white' : 'var(--text-muted)',
+                    fontWeight: 700, fontSize: '0.82rem', cursor: 'pointer',
+                    transition: 'all 0.2s',
+                  }}
+                >
+                  {label}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          <div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 10 }}>
+              <LuClock size={16} style={{ color: 'var(--brand-primary)' }} />
+              <span style={{ fontWeight: 800, fontSize: '0.8rem', textTransform: 'uppercase', letterSpacing: '0.08em', color: 'var(--text-dark)' }}>Status</span>
+            </div>
+            <div style={{ display: 'flex', gap: 8 }}>
+              {[
+                { label: 'Open', sub: 2, active: filters.opened === '1' },
+                { label: 'Closed', sub: 1, active: filters.closed === '1' },
+              ].map(({ label, sub, active }) => (
+                <button
+                  key={label}
+                  onClick={() => handleSubFilterTab(sub)}
+                  style={{
+                    padding: '7px 14px',
+                    border: `1.5px solid ${active ? 'var(--brand-primary)' : 'var(--border-color)'}`,
+                    borderRadius: 10,
+                    background: active ? 'var(--brand-primary)' : 'white',
+                    color: active ? 'white' : 'var(--text-muted)',
+                    fontWeight: 700, fontSize: '0.82rem', cursor: 'pointer',
+                    transition: 'all 0.2s',
+                  }}
+                >
+                  {label}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          <div style={{ marginLeft: 'auto', display: 'flex', alignItems: 'flex-end' }}>
+            <button
+              onClick={clearAllFilters}
+              style={{
+                display: 'flex', alignItems: 'center', gap: 6,
+                padding: '7px 14px',
+                border: '1.5px solid var(--border-color)',
+                borderRadius: 10,
+                background: 'transparent',
+                color: 'var(--text-muted)',
+                fontWeight: 700, fontSize: '0.82rem', cursor: 'pointer',
+              }}
+            >
+              <LuX size={14} />
+              Clear
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* ── Grid ── */}
+      {poolLoading ? (
+        <div style={{ display: 'flex', justifyContent: 'center', padding: '80px 0' }}>
+          <Hourglass visible height="64" width="64" colors={['#5D5FEF', '#FF7EB3']} />
         </div>
       ) : (
         <>
-          <div className="row g-4">
-            {pools?.items?.length > 0 ? (
-              pools.items.map((pool) => (
-                <div key={pool.id} className="col-md-6 col-lg-4">
-                  <Pool pool={pool} />
-                </div>
-              ))
-            ) : (
-              <div className="col-12">
-                <div className="glass rounded-2xl border-soft p-5 text-center shadow-soft">
-                  <h3 className="fw-semibold mb-3">No pools found</h3>
-                  <p className="text-slate-500 mb-4">Try adjusting your filters or create a new pool</p>
-                  <Link
-                    to="/pool-create"
-                    className="btn btn-primary rounded-xl d-inline-flex align-items-center gap-1"
-                  >
-                    <FiPlus />
-                    Create Pool
-                  </Link>
-                </div>
+          {pools?.items?.length > 0 ? (
+            <>
+              <div style={{
+                display: 'grid',
+                gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))',
+                gap: 24,
+                marginBottom: 32,
+              }}>
+                {pools.items.map((pool) => (
+                  <Pool key={pool.id} pool={pool} />
+                ))}
               </div>
-            )}
-          </div>
 
-          {loadMoreLoading && (
-            <div className="d-flex justify-content-center my-4">
-              <Hourglass
-                visible={true}
-                height="60"
-                width="60"
-                colors={['#FFD59B', '#FFC371']}
-              />
-            </div>
-          )}
+              {loadMoreLoading && (
+                <div style={{ display: 'flex', justifyContent: 'center', padding: '24px 0' }}>
+                  <Hourglass visible height="48" width="48" colors={['#5D5FEF', '#FF7EB3']} />
+                </div>
+              )}
 
-          {pools?.total > 0 && pools.items.length < pools.total && (
-            <div className="d-flex justify-content-center mt-4">
-              <button
-                onClick={handleLoadMore}
-                disabled={loadMoreLoading}
-                className="btn btn-outline-secondary rounded-xl"
+              {pools.total > 0 && pools.items.length < pools.total && (
+                <div style={{ display: 'flex', justifyContent: 'center', paddingBottom: 16 }}>
+                  <button
+                    onClick={handleLoadMore}
+                    disabled={loadMoreLoading}
+                    style={{
+                      padding: '14px 48px',
+                      background: 'var(--text-dark)',
+                      color: 'white',
+                      border: 'none',
+                      borderRadius: 24,
+                      fontWeight: 800,
+                      fontSize: '0.9rem',
+                      cursor: 'pointer',
+                      boxShadow: '0 8px 24px rgba(26,26,46,0.15)',
+                      transition: 'transform 0.15s, box-shadow 0.15s',
+                    }}
+                    onMouseEnter={(e) => { e.currentTarget.style.transform = 'scale(1.03)'; }}
+                    onMouseLeave={(e) => { e.currentTarget.style.transform = 'scale(1)'; }}
+                  >
+                    {loadMoreLoading ? 'Loading…' : 'Load more pools'}
+                  </button>
+                </div>
+              )}
+            </>
+          ) : (
+            <div style={{
+              background: 'white',
+              borderRadius: 32,
+              border: '1px solid var(--border-color)',
+              padding: '64px 32px',
+              textAlign: 'center',
+            }}>
+              <div style={{
+                width: 64, height: 64,
+                borderRadius: 20,
+                background: 'var(--brand-primary-light)',
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                margin: '0 auto 20px',
+              }}>
+                <LuSearch size={28} style={{ color: 'var(--brand-primary)' }} />
+              </div>
+              <h3 style={{ fontWeight: 800, color: 'var(--text-dark)', marginBottom: 8 }}>No pools found</h3>
+              <p style={{ color: 'var(--text-muted)', fontWeight: 500, marginBottom: 24 }}>
+                Try adjusting your filters or create a new pool.
+              </p>
+              <Link
+                to="/pool-create"
+                style={{
+                  display: 'inline-flex', alignItems: 'center', gap: 6,
+                  padding: '12px 24px',
+                  background: 'var(--brand-primary)',
+                  color: 'white',
+                  borderRadius: 14,
+                  fontWeight: 800, fontSize: '0.9rem',
+                  textDecoration: 'none',
+                  boxShadow: '0 4px 14px rgba(93,95,239,0.25)',
+                }}
               >
-                {loadMoreLoading ? 'Loading...' : 'Load More'}
-              </button>
+                <LuPlus size={16} strokeWidth={3} />
+                Create Pool
+              </Link>
             </div>
           )}
         </>

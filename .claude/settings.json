@@ -1,0 +1,12 @@
+{
+  "permissions": {
+    "allow": [
+      "Read(//e/collectly/**)",
+      "Bash(node -e \"const ri = require\\('react-icons/lu'\\); const needed = ['LuPlus','LuLayoutDashboard','LuWaves','LuLifeBuoy','LuBell','LuUser','LuLogOut','LuSettings','LuChevronDown','LuSearch','LuSlidersHorizontal','LuUsers','LuClock','LuArrowUpDown','LuX','LuCalendar','LuTrendingUp','LuDollarSign','LuExternalLink','LuZap']; needed.forEach\\(n => { if\\(!ri[n]\\) console.log\\('MISSING:', n\\); else console.log\\('OK:', n\\); }\\)\")",
+      "Bash(node -e \"const ri = require\\('react-icons/lu'\\); console.log\\('LuChevronRight:', !!ri.LuChevronRight\\)\")",
+      "Bash(node -e \"require\\('react-icons/lu'\\); console.log\\('OK'\\)\")",
+      "Bash(node -e ' *)",
+      "Bash(xargs grep *)"
+    ]
+  }
+}

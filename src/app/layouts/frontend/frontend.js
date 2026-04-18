@@ -8,249 +8,341 @@ import {
   useLocation,
   Outlet,
 } from "react-router-dom";
-import {
-  getNotificationsUnRead
-} from "../../slices/auth";
-import {
-  getAccount
-} from "../../slices/user";
+import { getNotificationsUnRead } from "../../slices/auth";
+import { getAccount } from "../../slices/user";
 import EventBus from "../../common/eventBus";
 import TimeAgo from "react-timeago";
 import moment from "moment";
-import Switch from "react-switch";
-import { setHomeView } from "../../slices/general";
 import { logout } from "../../slices/auth";
-import Overlay from 'react-bootstrap/Overlay';
+import {
+  LuPlus,
+  LuLayoutDashboard,
+  LuWaves,
+  LuLifeBuoy,
+  LuBell,
+  LuUser,
+  LuLogOut,
+  LuSettings,
+  LuChevronDown,
+  LuGlobe,
+} from "react-icons/lu";
 
+const NavItem = ({ icon: Icon, label, to, active }) => (
+  <Link
+    to={to}
+    className={`header-nav-item ${active ? "active" : ""}`}
+  >
+    <Icon size={16} />
+    <span>{label}</span>
+  </Link>
+);
 
 const FrontendLayout = () => {
-  let navigate = useNavigate();
-  const searchParams = useLocation();
+  const navigate = useNavigate();
+  const location = useLocation();
   const dispatch = useDispatch();
   const { user: currentUser, isLoggedIn, notificationUnread } = useSelector((state) => state.auth);
   const { me: account } = useSelector((state) => state.user);
-  const [show, setShow] = useState(false);
-  const target = useRef(null);
+  const [showNotifications, setShowNotifications] = useState(false);
+  const [showUserMenu, setShowUserMenu] = useState(false);
+  const notifRef = useRef(null);
+  const userMenuRef = useRef(null);
 
   const logOut = useCallback(() => {
-
     dispatch(logout())
-      .unwrap().finally(() => {
-        navigate("/login")
+      .unwrap()
+      .finally(() => {
+        navigate("/login");
         window.location.reload();
       });
-
   }, [dispatch]);
 
   useEffect(() => {
-    EventBus.on("logout", () => {
-      logOut();
-    });
-
-    return () => {
-      EventBus.remove("logout");
-    };
+    EventBus.on("logout", () => logOut());
+    return () => EventBus.remove("logout");
   }, [logOut]);
 
   useEffect(() => {
     if (isLoggedIn) {
       Promise.all([
         dispatch(getNotificationsUnRead({ userId: currentUser.user.id, page: 1, pageSize: 5 })),
-        dispatch(getAccount({ userId: currentUser.user.id }))
+        dispatch(getAccount({ userId: currentUser.user.id })),
       ]);
     }
   }, [isLoggedIn]);
 
-  function utcToLocal(utcdateTime) {
-    var localDateTime = moment(utcdateTime).local();
-    return localDateTime;
-  }
+  // Close dropdowns on outside click
+  useEffect(() => {
+    const handler = (e) => {
+      if (notifRef.current && !notifRef.current.contains(e.target)) setShowNotifications(false);
+      if (userMenuRef.current && !userMenuRef.current.contains(e.target)) setShowUserMenu(false);
+    };
+    document.addEventListener("mousedown", handler);
+    return () => document.removeEventListener("mousedown", handler);
+  }, []);
 
   const handleRedirect = (url) => {
-    const action = new URLSearchParams(searchParams.search).get("action");
-    const returnUrl = new URLSearchParams(searchParams.search).get("returnUrl");
-
-    if (returnUrl) {
-      return navigate(`${url}?returnUrl=${encodeURIComponent(returnUrl)}`);
-    } else if (action === 'invited') {
-      let invitedUrl = `${searchParams.pathname}${searchParams.search}`;
+    const action = new URLSearchParams(location.search).get("action");
+    const returnUrl = new URLSearchParams(location.search).get("returnUrl");
+    if (returnUrl) return navigate(`${url}?returnUrl=${encodeURIComponent(returnUrl)}`);
+    if (action === "invited") {
+      const invitedUrl = `${location.pathname}${location.search}`;
       return navigate(`${url}?returnUrl=${encodeURIComponent(invitedUrl)}`);
     }
-    return navigate(`${url}`);
-  }
+    return navigate(url);
+  };
 
-
+  const unreadCount = notificationUnread?.pagination?.totalItems || 0;
+  const photoUrl = account?.photoUrl || "https://app.collectly.com/public/img/user.png";
 
   return (
     <>
-      <nav className="navbar navbar-expand-lg navbar-light bg-white-70 sticky-top border-bottom shadow-soft">
-        <div className="container-xl px-3 px-md-4 py-2 d-flex align-items-center justify-content-between">
-          {/* Left side - Logo/Brand */}
-          <div className="d-flex align-items-center gap-2">
-            <Link className="navbar-brand d-flex align-items-center gap-2" to="/">
-              <img
-                src="assets/img/logo.png"
-                alt="Logo"
-                className="navbar-brand-logo"
-                style={{ width: '40px', height: '40px', objectFit: 'cover' }}></img>
-              <div>
-                <div className="text-xs uppercase tracking-tight text-slate-500">Collectly</div>
+      <header className="collectly-header">
+        <div className="header-inner">
+          {/* Brand */}
+          <div style={{ display: "flex", alignItems: "center", gap: "32px" }}>
+            <Link to="/" className="brand-logo">
+              <div className="brand-icon">
+                <LuPlus size={20} strokeWidth={3} />
               </div>
+              <span className="brand-name">COLLECTLY</span>
             </Link>
-          </div>
 
-          {/* Center - Navigation Links */}
-          <div className="collapse navbar-collapse" id="navbarNavDropdown">
-            <ul className="navbar-nav mx-auto">
-              {currentUser && (
-                <li className="nav-item">
-                  <Link to="/dashboard" className="nav-link">
-                    Dashboard
-                  </Link>
-                </li>
-              )}
-              {currentUser && (
-                <li className="nav-item">
-                  <Link to="/pools" className="nav-link">
-                    Pools
-                  </Link>
-                </li>
-              )}
-              {currentUser && (
-                <li className="nav-item">
-                  <Link to="/support" className="nav-link">
-                    Support
-                  </Link>
-                </li>
-              )}
-            </ul>
-          </div>
-
-          {/* Right side - User Controls */}
-          <div className="d-flex align-items-center gap-3">
-            {/* Notification Bell */}
             {currentUser && (
-              <div className="position-relative">
-                <i
-                  className="bi bi-bell text-slate-500"
-                  aria-hidden="true"
-                  ref={target}
-                  onClick={() => setShow(!show)}
-                  style={{ fontSize: '1.2rem', cursor: 'pointer' }}
-                ></i>
-                <span className="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
-                  {notificationUnread?.pagination?.totalItems || 0}
-                </span>
+              <nav className="header-nav">
+                <NavItem icon={LuGlobe} label="Home" to="/" active={location.pathname === "/"} />
+                <NavItem icon={LuWaves} label="Pools" to="/pools" active={location.pathname === "/pools"} />
+                <NavItem icon={LuLayoutDashboard} label="Dashboard" to="/dashboard" active={location.pathname === "/dashboard"} />
+                <NavItem icon={LuLifeBuoy} label="Support" to="/support" active={location.pathname === "/support"} />
+              </nav>
+            )}
+          </div>
 
-                <Overlay target={target.current} show={show} placement="bottom">
-                  {(props) => (
-                    <div
-                      {...props}
-                      style={{
-                        ...props.style,
-                        position: 'absolute',
-                        background: '#FFFFFF',
-                        padding: '15px',
-                        borderRadius: '10px',
-                        width: '350px',
-                        boxShadow: '0 0.5rem 1rem rgba(0, 0, 0, 0.15)',
-                        zIndex: 1050
-                      }}
-                    >
-                      <h5 className="text-title-2 text-center mb-3">Notifications</h5>
-                      <ul className="notification-items mb-0 list-unstyled">
-                        {notificationUnread?.notifications?.map((item, index) => (
-                          <li key={index} className="py-2 border-bottom">
-                            <a href="#" className="text-decoration-none">
-                              <p className="text-body-2 mb-0">{item.message}</p>
-                              <small className="text-muted">
-                                <TimeAgo date={utcToLocal(new Date(item.createdAt))} />
+          {/* Right side */}
+          <div className="header-right">
+            {currentUser ? (
+              <>
+                {/* Create pool button */}
+                <Link to="/pool-create" className="btn-create-pool">
+                  <LuPlus size={16} strokeWidth={3} />
+                  Start a Pool
+                </Link>
+
+                <div className="header-divider" />
+
+                {/* Notifications */}
+                <div ref={notifRef} style={{ position: "relative" }}>
+                  <button
+                    className="notification-bell-btn"
+                    onClick={() => { setShowNotifications(!showNotifications); setShowUserMenu(false); }}
+                    aria-label="Notifications"
+                  >
+                    <LuBell size={20} />
+                    {unreadCount > 0 && (
+                      <span className="notification-badge">{unreadCount}</span>
+                    )}
+                  </button>
+
+                  {showNotifications && (
+                    <div className="notification-dropdown">
+                      <h5>Notifications</h5>
+                      <ul style={{ listStyle: "none", padding: 0, margin: 0 }}>
+                        {notificationUnread?.notifications?.length > 0 ? (
+                          notificationUnread.notifications.map((item, i) => (
+                            <li key={i} className="notification-item">
+                              <p>{item.message}</p>
+                              <small>
+                                <TimeAgo date={moment(item.createdAt).local().toDate()} />
                               </small>
-                            </a>
+                            </li>
+                          ))
+                        ) : (
+                          <li style={{ textAlign: "center", padding: "20px 0", color: "var(--text-muted)", fontSize: "0.85rem" }}>
+                            No new notifications
                           </li>
-                        ))}
+                        )}
                       </ul>
-                      <br></br>
-                      <Link to={`/notifications`} className="btn btn-sm btn-outline-secondary rounded-xl text-center">
-                        View
+                      <Link
+                        to="/notifications"
+                        onClick={() => setShowNotifications(false)}
+                        style={{
+                          display: "block",
+                          marginTop: "10px",
+                          textAlign: "center",
+                          fontSize: "0.8rem",
+                          fontWeight: 700,
+                          color: "var(--brand-primary)",
+                          textDecoration: "none",
+                        }}
+                      >
+                        View all
                       </Link>
                     </div>
                   )}
-                </Overlay>
-              </div>
-            )}
+                </div>
 
-            {/* User Dropdown */}
-            {currentUser && (
-              <div className="dropdown">
-                <a
-                  className="nav-link dropdown-toggle d-flex align-items-center"
-                  href="#"
-                  id="navbarUserDropdown"
-                  role="button"
-                  data-bs-toggle="dropdown"
-                  aria-expanded="false"
-                >
-                  <img
-                    className="user-avatar rounded-circle me-2"
-                    src={account.photoUrl || 'https://app.collectly.com/public/img/user.png'}
-                    alt="user-avatar"
-                    style={{ width: '32px', height: '32px', objectFit: 'cover' }}
-                  />
-                  <span className="d-none d-md-inline">{currentUser.user.username}</span>
-                </a>
-                <ul className="dropdown-menu dropdown-menu-end" aria-labelledby="navbarUserDropdown">
-                  <li>
-                    <Link to="/account" className="dropdown-item">
-                      <i className="bi bi-person me-2"></i> My Account
-                    </Link>
-                  </li>
-                  <li>
-                    <hr className="dropdown-divider" />
-                  </li>
-                  <li>
-                    <Link className="dropdown-item" onClick={logOut}>
-                      <i className="bi bi-box-arrow-right me-2"></i> Sign Out
-                    </Link>
-                  </li>
-                </ul>
-              </div>
-            )}
+                {/* User avatar / dropdown */}
+                <div ref={userMenuRef} style={{ position: "relative" }}>
+                  <button
+                    className={`user-avatar-btn ${location.pathname === "/account" ? "active" : ""}`}
+                    onClick={() => { setShowUserMenu(!showUserMenu); setShowNotifications(false); }}
+                    aria-label="User menu"
+                  >
+                    <img src={photoUrl} alt="avatar" />
+                  </button>
 
-            {/* Login/Signup Buttons */}
-            {!currentUser && (
+                  {showUserMenu && (
+                    <div
+                      style={{
+                        position: "absolute",
+                        top: "calc(100% + 10px)",
+                        right: 0,
+                        minWidth: 200,
+                        background: "white",
+                        borderRadius: 16,
+                        boxShadow: "var(--shadow-lg)",
+                        border: "1px solid var(--border-color)",
+                        padding: "8px",
+                        zIndex: 200,
+                      }}
+                    >
+                      <div style={{ padding: "12px 14px 10px", borderBottom: "1px solid var(--border-color)", marginBottom: 6 }}>
+                        <div style={{ fontSize: "0.85rem", fontWeight: 800, color: "var(--text-dark)" }}>
+                          {currentUser.user.username}
+                        </div>
+                        <div style={{ fontSize: "0.75rem", color: "var(--text-muted)" }}>
+                          {currentUser.user.email}
+                        </div>
+                      </div>
+                      {[
+                        { icon: LuUser, label: "My Account", to: "/account" },
+                        { icon: LuSettings, label: "Settings", to: "/account" },
+                      ].map(({ icon: Icon, label, to }) => (
+                        <Link
+                          key={label}
+                          to={to}
+                          onClick={() => setShowUserMenu(false)}
+                          style={{
+                            display: "flex",
+                            alignItems: "center",
+                            gap: 10,
+                            padding: "10px 14px",
+                            borderRadius: 10,
+                            textDecoration: "none",
+                            color: "var(--text-dark)",
+                            fontSize: "0.85rem",
+                            fontWeight: 600,
+                            transition: "background 0.15s",
+                          }}
+                          onMouseEnter={(e) => (e.currentTarget.style.background = "var(--surface)")}
+                          onMouseLeave={(e) => (e.currentTarget.style.background = "transparent")}
+                        >
+                          <Icon size={16} />
+                          {label}
+                        </Link>
+                      ))}
+                      <div style={{ borderTop: "1px solid var(--border-color)", marginTop: 6, paddingTop: 6 }}>
+                        <button
+                          onClick={() => { setShowUserMenu(false); logOut(); }}
+                          style={{
+                            display: "flex",
+                            alignItems: "center",
+                            gap: 10,
+                            width: "100%",
+                            padding: "10px 14px",
+                            border: "none",
+                            background: "transparent",
+                            borderRadius: 10,
+                            color: "var(--danger)",
+                            fontSize: "0.85rem",
+                            fontWeight: 700,
+                            cursor: "pointer",
+                            transition: "background 0.15s",
+                          }}
+                          onMouseEnter={(e) => (e.currentTarget.style.background = "#fff5f5")}
+                          onMouseLeave={(e) => (e.currentTarget.style.background = "transparent")}
+                        >
+                          <LuLogOut size={16} />
+                          Sign Out
+                        </button>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </>
+            ) : (
               <>
                 <button
                   onClick={() => handleRedirect("/login")}
-                  className="btn btn-sm btn-outline-primary rounded-xl"
+                  className="btn-sign-in"
                 >
                   Sign In
                 </button>
                 <button
                   onClick={() => handleRedirect("/register")}
-                  className="btn btn-sm btn-primary rounded-xl"
+                  className="btn-create-pool"
                 >
                   Sign Up
                 </button>
               </>
             )}
           </div>
-
-          {/* Mobile Toggle Button */}
-          <button
-            className="navbar-toggler"
-            type="button"
-            data-bs-toggle="collapse"
-            data-bs-target="#navbarNavDropdown"
-            aria-controls="navbarNavDropdown"
-            aria-expanded="false"
-            aria-label="Toggle navigation"
-          >
-            <span className="navbar-toggler-icon"></span>
-          </button>
         </div>
-      </nav>
+      </header>
+
       <Outlet />
+
+      {/* Footer */}
+      <footer style={{
+        padding: "40px 24px",
+        borderTop: "1px solid var(--border-color)",
+        marginTop: "auto",
+      }}>
+        <div style={{
+          maxWidth: 1280,
+          margin: "0 auto",
+          display: "flex",
+          flexWrap: "wrap",
+          alignItems: "center",
+          justifyContent: "space-between",
+          gap: 16,
+          color: "var(--text-muted)",
+          fontSize: "0.75rem",
+          fontWeight: 700,
+        }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+            <div style={{
+              width: 28, height: 28,
+              background: "var(--brand-primary)",
+              borderRadius: 8,
+              display: "flex", alignItems: "center", justifyContent: "center",
+              color: "white",
+              transform: "rotate(12deg)",
+            }}>
+              <LuPlus size={14} strokeWidth={3} />
+            </div>
+            <span style={{ textTransform: "uppercase", letterSpacing: "0.15em" }}>
+              &copy; {new Date().getFullYear()} COLLECTLY. ALL RIGHTS RESERVED.
+            </span>
+          </div>
+          <div style={{ display: "flex", gap: 24 }}>
+            {["Privacy", "Terms", "Contact"].map((t) => (
+              <a key={t} href="#" style={{
+                textDecoration: "none",
+                color: "var(--text-muted)",
+                fontWeight: 800,
+                textTransform: "uppercase",
+                letterSpacing: "0.12em",
+                fontSize: "0.7rem",
+                transition: "color 0.2s",
+              }}
+              onMouseEnter={(e) => (e.currentTarget.style.color = "var(--text-dark)")}
+              onMouseLeave={(e) => (e.currentTarget.style.color = "var(--text-muted)")}
+              >{t}</a>
+            ))}
+          </div>
+        </div>
+      </footer>
     </>
   );
 };

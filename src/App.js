@@ -33,6 +33,7 @@ import ResetPassword from "./app/pages/resetPassword/resetPassword";
 import Payouts from "./app/pages/payouts/payouts";
 import PoolMember from "./app/pages/poolMember/poolMember";
 import EmailVerification from "./app/pages/emailVerification/emailVerification";
+import Home from "./app/pages/home/home";
 
 
 const App = () => {
@@ -108,7 +109,7 @@ const App = () => {
             <Router>
                 <Routes>
                     <Route element={<FrontendLayout />}>
-                        <Route path="/" element={<Pools />} />
+                        <Route path="/" element={<Home />} />
                         <Route path="/login" element={<Login />} />
                         <Route path="/register" element={<Register />} />
                         <Route path="/forgot-password" element={<ForgotPassword />} />
