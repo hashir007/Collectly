@@ -10,8 +10,8 @@ const ProtectedRoute = ({ children, roles, }) => {
     const returnUrl = `?returnUrl=${formatReturnUrl}`;
 
     if (!isLoggedIn) {
-        return <Navigate to={`/login${returnUrl}`} />;
-    }  
+        return <Navigate to={`/home${returnUrl}`} />;
+    }
 
     return children;
 };

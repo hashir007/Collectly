@@ -110,10 +110,22 @@ const FrontendLayout = () => {
 
             {currentUser && (
               <nav className="header-nav">
-                <NavItem icon={LuGlobe} label="Home" to="/" active={location.pathname === "/"} />
-                <NavItem icon={LuWaves} label="Pools" to="/pools" active={location.pathname === "/pools"} />
-                <NavItem icon={LuLayoutDashboard} label="Dashboard" to="/dashboard" active={location.pathname === "/dashboard"} />
-                <NavItem icon={LuLifeBuoy} label="Support" to="/support" active={location.pathname === "/support"} />
+                {
+                  (!isLoggedIn) && (
+                    <NavItem icon={LuGlobe} label="Home" to="/" active={location.pathname === "/"} />
+                  )
+                }
+
+                {
+                  (isLoggedIn) && (<>
+                    <NavItem icon={LuLayoutDashboard} label="Dashboard" to="/dashboard" active={location.pathname === "/dashboard"} />
+                    <NavItem icon={LuWaves} label="Pools" to="/pools" active={location.pathname === "/pools"} />
+                    <NavItem icon={LuLifeBuoy} label="Support" to="/support" active={location.pathname === "/support"} />
+                  </>
+                  )
+                }
+
+
               </nav>
             )}
           </div>
@@ -336,8 +348,8 @@ const FrontendLayout = () => {
                 fontSize: "0.7rem",
                 transition: "color 0.2s",
               }}
-              onMouseEnter={(e) => (e.currentTarget.style.color = "var(--text-dark)")}
-              onMouseLeave={(e) => (e.currentTarget.style.color = "var(--text-muted)")}
+                onMouseEnter={(e) => (e.currentTarget.style.color = "var(--text-dark)")}
+                onMouseLeave={(e) => (e.currentTarget.style.color = "var(--text-muted)")}
               >{t}</a>
             ))}
           </div>

@@ -23,28 +23,8 @@ const STATS = [
 const Home = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const { user: currentUser } = useSelector((state) => state.auth);
-  const { pools } = useSelector((state) => state.pool);
-  const [loading, setLoading] = useState(false);
 
-  useEffect(() => {
-    setLoading(true);
-    dispatch(
-      filterPools({
-        page: 1,
-        pageSize: 3,
-        term: "",
-        joined: "",
-        owner: "",
-        closed: "",
-        opened: "1",
-        orderBy: "most_recent",
-        userId: currentUser?.user?.id || "",
-      })
-    ).finally(() => setLoading(false));
-  }, [dispatch, currentUser]);
 
-  const featuredPools = pools?.pools?.slice(0, 3) || [];
 
   return (
     <div className={styles.homePage}>
@@ -95,31 +75,6 @@ const Home = () => {
             </Link>
           </div>
 
-          {loading ? (
-            <div className={styles.loadingState}>
-              <Hourglass
-                visible
-                height={40}
-                width={40}
-                ariaLabel="Loading pools"
-                colors={["#5D5FEF", "#a5a6f6"]}
-              />
-            </div>
-          ) : (
-            <div className={styles.poolGrid}>
-              {featuredPools.length > 0 ? (
-                featuredPools.map((pool) => <Pool key={pool.id} pool={pool} />)
-              ) : (
-                <div className={styles.emptyState}>
-                  <p>No pools yet — be the first to start one!</p>
-                  <Link to="/pool-create" className={styles.heroBtnPrimary} style={{ display: "inline-flex", marginTop: 16 }}>
-                    <LuPlus size={16} />
-                    Start a Pool
-                  </Link>
-                </div>
-              )}
-            </div>
-          )}
         </section>
 
         {/* ── Trust Section ── */}
