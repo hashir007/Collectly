@@ -181,6 +181,11 @@ const Register = () => {
       <section className={styles.registerArea}>
         <div className={styles.container}>
           <div className={styles.registerCard}>
+            <div className={styles.brandMark}>
+              <div className={styles.brandIcon}>
+                <i className="bi bi-person-plus-fill"></i>
+              </div>
+            </div>
             <div className={styles.header}>
               <h2 className={styles.title}>Create An Account</h2>
               <p className={styles.subtitle}>Sign up for Collectly and Simplify Group Contributions with Ease</p>

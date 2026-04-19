@@ -8,25 +8,74 @@
   flex-grow: 1;
   display: flex;
   align-items: center;
-  padding: 3rem 0;
-  background: linear-gradient(135deg, #f8fafc 0%, #eef2f6 100%);
+  padding: 3rem 1rem;
+  position: relative;
+  background: linear-gradient(135deg, #f0f4f8 0%, #e8e8fd 50%, #f0f4f8 100%);
+  overflow: hidden;
+}
+
+.registerArea::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(ellipse at 15% 25%, rgba(93, 95, 239, 0.12) 0%, transparent 55%),
+    radial-gradient(ellipse at 85% 75%, rgba(255, 126, 179, 0.08) 0%, transparent 50%),
+    radial-gradient(ellipse at 55% 5%, rgba(74, 222, 128, 0.07) 0%, transparent 40%);
+  pointer-events: none;
 }
 
 .container {
   width: 100%;
   max-width: 1200px;
   margin: 0 auto;
-  padding: 0 1rem;
+  position: relative;
+  z-index: 1;
 }
 
-.registerCard {  
+.registerCard {
+  max-width: 56rem;
   margin: 0 auto;
-  background: rgba(255, 255, 255, 0.85);
-  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
-  backdrop-filter: blur(10px);
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  border-radius: 1.5rem;
-  padding: 2rem;
+  background: rgba(255, 255, 255, 0.9);
+  box-shadow: 0 20px 40px rgba(93, 95, 239, 0.1), 0 4px 12px rgba(0, 0, 0, 0.06);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(93, 95, 239, 0.12);
+  border-radius: 32px;
+  padding: 2.5rem;
+  position: relative;
+  overflow: hidden;
+}
+
+.registerCard::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: linear-gradient(90deg, #5D5FEF, #FF7EB3, #4ADE80);
+  border-radius: 32px 32px 0 0;
+}
+
+.brandMark {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 1.5rem;
+}
+
+.brandIcon {
+  width: 56px;
+  height: 56px;
+  background: linear-gradient(135deg, #5D5FEF, #7879f1);
+  border-radius: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  font-size: 1.5rem;
+  box-shadow: 0 8px 24px rgba(93, 95, 239, 0.35);
 }
 
 .header {
@@ -35,14 +84,18 @@
 }
 
 .title {
-  font-size: 1.875rem;
-  font-weight: 700;
-  color: #1e293b;
+  font-size: clamp(1.6rem, 4vw, 2rem);
+  font-weight: 800;
+  color: #1A1A2E;
   margin-bottom: 0.5rem;
+  letter-spacing: -0.02em;
+  line-height: 1.2;
 }
 
 .subtitle {
-  color: #64748b;
+  color: #6B7280;
+  font-size: 0.9rem;
+  line-height: 1.6;
   margin: 0 auto;
 }
 
@@ -57,40 +110,48 @@
 }
 
 .formGroup {
-  margin-bottom: 1rem;
+  margin-bottom: 0.25rem;
 }
 
 .label {
   display: block;
   font-size: 0.875rem;
-  font-weight: 500;
-  color: #1e293b;
+  font-weight: 600;
+  color: #1A1A2E;
   margin-bottom: 0.5rem;
 }
 
 .input {
   width: 100%;
-  padding: 0.5rem 1rem;
-  border: 1px solid #e2e8f0;
-  border-radius: 0.75rem;
-  font-size: 1rem;
+  padding: 0.75rem 1rem;
+  border: 1.5px solid #e8eaf0;
+  border-radius: 12px;
+  font-size: 0.95rem;
+  color: #1A1A2E;
+  background: #fff;
   transition: all 0.2s ease-in-out;
+  font-family: inherit;
+}
+
+.input::placeholder {
+  color: #9ca3af;
 }
 
 .input:focus {
   outline: none;
-  border-color: #FFD59B;
-  box-shadow: 0 0 0 2px rgba(255, 213, 155, 0.25);
+  border-color: #5D5FEF;
+  box-shadow: 0 0 0 3px rgba(93, 95, 239, 0.15);
 }
 
 .inputError {
   border-color: #ef4444;
+  box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.1);
 }
 
 .errorMessage {
   color: #ef4444;
   font-size: 0.75rem;
-  margin-top: 0.25rem;
+  margin-top: 0.35rem;
 }
 
 .buttonWrapper {
@@ -99,25 +160,58 @@
 
 .button {
   width: 100%;
-  padding: 0.75rem 1.25rem;
-  background-color: #FFD59B;
-  border: 1px solid #FFD59B;
-  color: #1e293b;
-  font-weight: 500;
-  border-radius: 0.75rem;
+  padding: 0.85rem 1.5rem;
+  background: #5D5FEF;
+  border: none;
+  color: #fff;
+  font-weight: 700;
+  font-size: 0.95rem;
+  border-radius: 12px;
   cursor: pointer;
-  transition: all 0.2s ease-in-out;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 0.5rem;
+  transition: transform 0.2s, box-shadow 0.2s, background 0.2s;
+  box-shadow: 0 8px 24px rgba(93, 95, 239, 0.35);
+  font-family: inherit;
 }
 
-.button:hover {
-  background-color: #FFC371;
-  border-color: #FFC371;
-  transform: translateY(-1px);
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+.button:hover:not(:disabled) {
+  background: #4a4cdb;
+  transform: scale(1.02);
+  box-shadow: 0 12px 32px rgba(93, 95, 239, 0.45);
 }
 
+.button:active:not(:disabled) {
+  transform: scale(0.99);
+}
+
+.buttonDisabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* Two-column layout */
+.twoColumnLayout {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.25rem;
+  margin-bottom: 0.5rem;
+}
+
+.column {
+  display: flex;
+  flex-direction: column;
+}
+
+.fullWidthSection {
+  grid-column: 1 / -1;
+}
+
+/* Checkboxes */
 .checkboxGroup {
-  margin: 1rem 0;
+  margin: 0.75rem 0;
 }
 
 .checkboxLabel {
@@ -125,69 +219,151 @@
   align-items: flex-start;
   gap: 0.5rem;
   font-size: 0.875rem;
-  color: #1e293b;
+  color: #1A1A2E;
   cursor: pointer;
 }
 
 .checkbox {
   margin-top: 0.2rem;
+  accent-color: #5D5FEF;
+  width: 16px;
+  height: 16px;
+  flex-shrink: 0;
+}
+
+.checkboxError {
+  color: #dc2626;
 }
 
 .smsNote {
   font-size: 0.75rem;
-  color: #64748b;
+  color: #6B7280;
   margin-top: 0.5rem;
   margin-left: 1.5rem;
+  line-height: 1.5;
 }
 
-.alert {
-  padding: 0.75rem 1.25rem;
-  margin-bottom: 1.5rem;
-  border: 1px solid transparent;
-  border-radius: 0.5rem;
-  font-size: 0.875rem;
-}
-
-.alertSuccess {
-  background-color: #d1fae5;
-  color: #047857;
-}
-
-.alertDanger {
-  background-color: #fee2e2;
-  color: #b91c1c;
-}
-
-/* Phone input styles */
+/* Phone input */
 .phoneContainer {
   width: 100%;
 }
 
 .phoneInput {
   width: 100% !important;
-  padding: 0.5rem 1rem 0.5rem 3.5rem !important;
-  border: 1px solid #e2e8f0 !important;
-  border-radius: 0.75rem !important;
-  font-size: 1rem !important;
+  padding: 0.75rem 1rem 0.75rem 3.5rem !important;
+  border: 1.5px solid #e8eaf0 !important;
+  border-radius: 12px !important;
+  font-size: 0.95rem !important;
   height: auto !important;
+  color: #1A1A2E !important;
+  font-family: inherit !important;
+  transition: all 0.2s ease-in-out !important;
+}
+
+.phoneInput:focus {
+  border-color: #5D5FEF !important;
+  box-shadow: 0 0 0 3px rgba(93, 95, 239, 0.15) !important;
 }
 
 .phoneButton {
   background: transparent !important;
   border: none !important;
-  border-right: 1px solid #e2e8f0 !important;
-  border-radius: 0.75rem 0 0 0.75rem !important;
+  border-right: 1.5px solid #e8eaf0 !important;
+  border-radius: 12px 0 0 12px !important;
 }
 
-/* Dark mode styles */
-@media (prefers-color-scheme: dark) {
-  .registerArea {
-    background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+/* Password requirements */
+.passwordRequirements {
+  margin-top: 10px;
+  font-size: 0.75rem;
+  background: #f8fafc;
+  border-radius: 10px;
+  padding: 10px 12px;
+  border: 1px solid #e8eaf0;
+}
+
+.requirementsTitle {
+  margin: 0 0 6px 0;
+  font-weight: 600;
+  color: #1A1A2E;
+  font-size: 0.75rem;
+}
+
+.requirementsList {
+  margin: 0;
+  padding-left: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.requirementMet {
+  color: #22c55e;
+  font-weight: 500;
+}
+
+.requirementNotMet {
+  color: #9ca3af;
+}
+
+/* Link */
+.link {
+  color: #5D5FEF;
+  text-decoration: underline;
+  font-weight: 500;
+}
+
+.link:hover {
+  color: #4a4cdb;
+}
+
+/* Required note */
+.requiredNote {
+  text-align: center;
+  font-size: 0.75rem;
+  color: #6B7280;
+  margin-top: 8px;
+}
+
+.requiredStar {
+  color: #dc2626;
+}
+
+.spinner {
+  margin-right: 8px;
+}
+
+.icon {
+  margin-right: 8px;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .twoColumnLayout {
+    grid-template-columns: 1fr;
   }
 
   .registerCard {
-    background: rgba(30, 41, 59, 0.85);
-    border-color: rgba(255, 255, 255, 0.1);
+    padding: 1.75rem 1.25rem;
+  }
+}
+
+/* Dark mode */
+@media (prefers-color-scheme: dark) {
+  .registerArea {
+    background: linear-gradient(135deg, #0f0f1a 0%, #1a1a3e 50%, #0f0f1a 100%);
+  }
+
+  .registerArea::before {
+    background:
+      radial-gradient(ellipse at 15% 25%, rgba(93, 95, 239, 0.25) 0%, transparent 55%),
+      radial-gradient(ellipse at 85% 75%, rgba(255, 126, 179, 0.15) 0%, transparent 50%);
+  }
+
+  .registerCard {
+    background: rgba(26, 26, 46, 0.9);
+    border-color: rgba(93, 95, 239, 0.2);
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4), 0 4px 12px rgba(93, 95, 239, 0.15);
   }
 
   .title {
@@ -203,14 +379,18 @@
   }
 
   .input {
-    background-color: #1e293b;
-    border-color: #334155;
+    background: rgba(255, 255, 255, 0.06);
+    border-color: rgba(255, 255, 255, 0.1);
     color: #f8fafc;
   }
 
+  .input::placeholder {
+    color: #4b5563;
+  }
+
   .input:focus {
-    background-color: #1e293b;
-    box-shadow: 0 0 0 2px rgba(255, 213, 155, 0.25);
+    border-color: #5D5FEF;
+    background: rgba(93, 95, 239, 0.08);
   }
 
   .checkboxLabel {
@@ -221,95 +401,27 @@
     color: #94a3b8;
   }
 
+  .passwordRequirements {
+    background: rgba(255, 255, 255, 0.05);
+    border-color: rgba(255, 255, 255, 0.08);
+  }
+
+  .requirementsTitle {
+    color: #e2e8f0;
+  }
+
+  .requiredNote {
+    color: #94a3b8;
+  }
+
   .phoneInput {
-    background-color: #1e293b !important;
-    border-color: #334155 !important;
+    background: rgba(255, 255, 255, 0.06) !important;
+    border-color: rgba(255, 255, 255, 0.1) !important;
     color: #f8fafc !important;
   }
 
   .phoneButton {
-    background: #1e293b !important;
-    border-right-color: #334155 !important;
+    background: rgba(255, 255, 255, 0.06) !important;
+    border-right-color: rgba(255, 255, 255, 0.1) !important;
   }
-}
-
-/* Add these styles to your Register.module.css */
-
-.twoColumnLayout {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 1rem;
-  margin-bottom: 1rem;
-}
-
-.column {
-  display: flex;
-  flex-direction: column;
-}
-
-.fullWidthSection {
-  grid-column: 1 / -1;
-}
-
-/* Responsive adjustments */
-@media (max-width: 768px) {
-  .twoColumnLayout {
-    grid-template-columns: 1fr;
-  }
-}
-
-.passwordRequirements {
-  margin-top: 8px;
-  font-size: 12px;
-}
-
-.requirementsTitle {
-  margin: 0 0 4px 0;
-  font-weight: 600;
-}
-
-.requirementsList {
-  margin: 0;
-  padding-left: 16px;
-}
-
-.requirementMet {
-  color: #22c55e;
-}
-
-.requirementNotMet {
-  color: #6b7280;
-}
-
-.checkboxError {
-  color: #dc2626;
-}
-
-.link {
-  color: #3b82f6;
-  text-decoration: underline;
-}
-
-.buttonDisabled {
-  opacity: 0.6;
-  cursor: not-allowed;
-}
-
-.spinner {
-  margin-right: 8px;
-}
-
-.icon {
-  margin-right: 8px;
-}
-
-.requiredNote {
-  text-align: center;
-  font-size: 12px;
-  color: #6b7280;
-  margin-top: 16px;
-}
-
-.requiredStar {
-  color: #dc2626;
 }

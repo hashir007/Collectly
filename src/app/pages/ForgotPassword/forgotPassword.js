@@ -103,6 +103,11 @@ const ForgotPassword = () => {
             <section className={styles.loginArea}>
                 <div className={styles.container}>
                     <div className={styles.loginCard}>
+                        <div className={styles.brandMark}>
+                            <div className={styles.brandIcon}>
+                                <i className="bi bi-key-fill"></i>
+                            </div>
+                        </div>
                         <div className={styles.header}>
                             <h2 className={styles.title}>Forgot Password</h2>
                             <p className={styles.subtitle}>
@@ -185,21 +190,21 @@ const ForgotPassword = () => {
                         ) : (
                             <div className={styles.successState}>
                                 <div className={styles.successIcon}>
-                                    <i className="bi bi-envelope-check"></i>
+                                    <i className="bi bi-envelope-check-fill"></i>
                                 </div>
                                 <p className={styles.successMessage}>
                                     If an account exists with this email, you will receive password reset instructions shortly.
                                 </p>
                                 <div className={styles.successActions}>
-                                    <Link to={"/login"} className={styles.button}>
-                                        <i className="bi bi-arrow-left me-2"></i>
+                                    <Link to={"/login"} className={styles.buttonSecondary}>
+                                        <i className="bi bi-arrow-left"></i>
                                         Back to Login
                                     </Link>
                                     <button
                                         className={styles.buttonSecondary}
                                         onClick={() => setIsSuccess(false)}
                                     >
-                                        <i className="bi bi-arrow-clockwise me-2"></i>
+                                        <i className="bi bi-arrow-clockwise"></i>
                                         Try Another Email
                                     </button>
                                 </div>

@@ -747,1090 +747,6 @@ const Account = () => {
                                 </div>
                             </div>
                         </div>
-
-                        {/* More Settings — Secondary Tabs */}
-                        <div className={styles.acCard}>
-                            <div className={styles.secondaryTabList}>
-                                {secondaryTabs.map(tab => (
-                                    <button
-                                        key={tab.key}
-                                        className={`${styles.secondaryTab} ${activeTab === tab.key ? styles.secondaryTabActive : ''}`}
-                                        onClick={() => setActiveTab(tab.key)}
-                                    >
-                                        {tab.label}
-                                    </button>
-                                ))}
-                            </div>
-
-                            {/* Tab Content */}
-                            {activeTab === 'paypal' && (
-                                <div className={styles.tabContentInner}>
-                                    <h4 className={styles.tabTitle}>
-                                        <i className="bi bi-paypal me-2"></i>
-                                        PayPal Settings
-                                    </h4>
-                                    <Formik
-                                        enableReinitialize
-                                        initialValues={{
-                                            payoutEmailAddress: payout?.payout_email_address || '',
-                                            payoutPayerID: payout?.payout_payer_id || '',
-                                        }}
-                                        validationSchema={Yup.object().shape({
-                                            payoutEmailAddress: Yup.string().required("Payout email address is required"),
-                                            payoutPayerID: Yup.string().required("Payout ID is required")
-                                        })}
-                                        onSubmit={handlePayoutSubmit}
-                                    >
-                                        {({ errors, touched, isSubmitting, handleSubmit }) => (
-                                            <Form onSubmit={handleSubmit}>
-                                                <Row>
-                                                    <Col md={6} className="mb-3">
-                                                        <Form.Group>
-                                                            <Form.Label className="fw-semibold">Paypal Email Address</Form.Label>
-                                                            <Field
-                                                                name="payoutEmailAddress"
-                                                                type="email"
-                                                                className={`form-control form-control-lg ${errors.payoutEmailAddress && touched.payoutEmailAddress ? "is-invalid" : ""}`}
-                                                            />
-                                                            <ErrorMessage name="payoutEmailAddress" component="div" className="invalid-feedback" />
-                                                        </Form.Group>
-                                                    </Col>
-                                                    <Col md={6} className="mb-3">
-                                                        <Form.Group>
-                                                            <Form.Label className="fw-semibold">Paypal PayerID</Form.Label>
-                                                            <Field
-                                                                name="payoutPayerID"
-                                                                type="text"
-                                                                className={`form-control form-control-lg ${errors.payoutPayerID && touched.payoutPayerID ? "is-invalid" : ""}`}
-                                                            />
-                                                            <ErrorMessage name="payoutPayerID" component="div" className="invalid-feedback" />
-                                                        </Form.Group>
-                                                    </Col>
-                                                </Row>
-                                                <div className="d-flex gap-3">
-                                                    <Button type="submit" variant="primary" size="lg" disabled={isSubmitting} className="px-4">
-                                                        {isSubmitting ? (
-                                                            <><Spinner animation="border" size="sm" className="me-2" />Updating...</>
-                                                        ) : 'Update Payout'}
-                                                    </Button>
-                                                    <Button type="button" variant="outline-secondary" size="lg" onClick={() => navigate('/')}>
-                                                        Cancel
-                                                    </Button>
-                                                </div>
-                                            </Form>
-                                        )}
-                                    </Formik>
-                                </div>
-                            )}
-
-                            {activeTab === 'password' && (
-                                <div className={styles.tabContentInner}>
-                                    <h4 className={styles.tabTitle}>
-                                        <i className="bi bi-lock me-2"></i>
-                                        Change Password
-                                    </h4>
-                                    <Formik
-                                        initialValues={{
-                                            currentPassword: '',
-                                            newPassword: '',
-                                            confirmPassword: ''
-                                        }}
-                                        validationSchema={Yup.object().shape({
-                                            currentPassword: Yup.string().required("Current password is required"),
-                                            newPassword: Yup.string()
-                                                .min(8, "Password must be at least 8 characters")
-                                                .required("New password is required"),
-                                            confirmPassword: Yup.string()
-                                                .oneOf([Yup.ref('newPassword'), null], 'Passwords must match')
-                                                .required("Please confirm your password")
-                                        })}
-                                        onSubmit={handlePasswordSubmit}
-                                    >
-                                        {({ errors, touched, isSubmitting, handleSubmit }) => (
-                                            <Form onSubmit={handleSubmit} className={styles.maxW500}>
-                                                <Row>
-                                                    <Col md={8} className="mb-3">
-                                                        <Form.Group>
-                                                            <Form.Label className="fw-semibold">Current Password</Form.Label>
-                                                            <Field
-                                                                name="currentPassword"
-                                                                type="password"
-                                                                className={`form-control form-control-lg ${errors.currentPassword && touched.currentPassword ? "is-invalid" : ""}`}
-                                                            />
-                                                            <ErrorMessage name="currentPassword" component="div" className="invalid-feedback" />
-                                                        </Form.Group>
-                                                    </Col>
-                                                </Row>
-                                                <Row>
-                                                    <Col md={8} className="mb-3">
-                                                        <Form.Group>
-                                                            <Form.Label className="fw-semibold">New Password</Form.Label>
-                                                            <Field
-                                                                name="newPassword"
-                                                                type="password"
-                                                                className={`form-control form-control-lg ${errors.newPassword && touched.newPassword ? "is-invalid" : ""}`}
-                                                            />
-                                                            <ErrorMessage name="newPassword" component="div" className="invalid-feedback" />
-                                                        </Form.Group>
-                                                    </Col>
-                                                </Row>
-                                                <Row>
-                                                    <Col md={8} className="mb-4">
-                                                        <Form.Group>
-                                                            <Form.Label className="fw-semibold">Confirm New Password</Form.Label>
-                                                            <Field
-                                                                name="confirmPassword"
-                                                                type="password"
-                                                                className={`form-control form-control-lg ${errors.confirmPassword && touched.confirmPassword ? "is-invalid" : ""}`}
-                                                            />
-                                                            <ErrorMessage name="confirmPassword" component="div" className="invalid-feedback" />
-                                                        </Form.Group>
-                                                    </Col>
-                                                </Row>
-                                                <Button type="submit" variant="primary" size="lg" disabled={isSubmitting} className="px-4">
-                                                    {isSubmitting ? (
-                                                        <><Spinner animation="border" size="sm" className="me-2" />Changing...</>
-                                                    ) : 'Change Password'}
-                                                </Button>
-                                            </Form>
-                                        )}
-                                    </Formik>
-                                </div>
-                            )}
-
-                            {activeTab === 'contributions' && (
-                                <div className={styles.tabContentInner}>
-                                    <h4 className={styles.tabTitle}>
-                                        <i className="bi bi-cash-stack me-2"></i>
-                                        Contributions
-                                    </h4>
-                                    <div>
-                                        <Table responsive>
-                                            <thead>
-                                                <tr>
-                                                    <th>Pool</th>
-                                                    <th>Amount</th>
-                                                    <th>Transaction ID</th>
-                                                    <th>Status</th>
-                                                    <th>Created Date</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody>
-                                                {contributions?.pagination?.totalItems > 0 ? (
-                                                    contributions.transactions.map((item, index) => (
-                                                        <tr key={item.id || index}>
-                                                            <td>{item?.Pool?.name || 'N/A'}</td>
-                                                            <td>${item?.amount || 0}</td>
-                                                            <td>{item?.transaction_id || 'N/A'}</td>
-                                                            <td>{item?.status || 'N/A'}</td>
-                                                            <td>{item?.createdAt ? moment(item.createdAt).format("dddd, Do MMMM YYYY, h:mm:ss A") : 'N/A'}</td>
-                                                        </tr>
-                                                    ))
-                                                ) : (
-                                                    <tr>
-                                                        <td colSpan="5" className="text-center text-muted">
-                                                            {contributions ? 'No contributions found' : 'Loading...'}
-                                                        </td>
-                                                    </tr>
-                                                )}
-                                            </tbody>
-                                        </Table>
-
-                                        {contributions?.pagination?.totalPages > 1 && (
-                                            <div className="d-flex justify-content-center mt-3">
-                                                <Pagination>
-                                                    <Pagination.Prev
-                                                        onClick={() => handlePageChangeContributionByUserId(contributions.pagination.currentPage - 1)}
-                                                        disabled={contributions.pagination.currentPage === 1}
-                                                    />
-                                                    {Array.from({ length: contributions.pagination.totalPages }, (_, i) => i + 1).map((number) => (
-                                                        <Pagination.Item
-                                                            key={number}
-                                                            active={number === contributions.pagination.currentPage}
-                                                            onClick={() => handlePageChangeContributionByUserId(number)}
-                                                        >
-                                                            {number}
-                                                        </Pagination.Item>
-                                                    ))}
-                                                    <Pagination.Next
-                                                        onClick={() => handlePageChangeContributionByUserId(contributions.pagination.currentPage + 1)}
-                                                        disabled={contributions.pagination.currentPage === contributions.pagination.totalPages}
-                                                    />
-                                                </Pagination>
-                                            </div>
-                                        )}
-                                    </div>
-                                </div>
-                            )}
-
-                            {activeTab === 'social' && (
-                                <div className={styles.tabContentInner}>
-                                    <h4 className={styles.tabTitle}>
-                                        <i className="bi bi-share me-2"></i>
-                                        Social Media Links
-                                    </h4>
-                                    <p className="text-muted mb-4">
-                                        Connect your social media accounts to share content and grow your audience
-                                    </p>
-
-                                    <Formik
-                                        initialValues={socialMediaInitialValues}
-                                        onSubmit={handleSocialMediaLinkUpdate}
-                                        enableReinitialize={true}
-                                    >
-                                        {({ errors, values, touched, isSubmitting, handleSubmit, isValid, dirty }) => (
-                                            <Form onSubmit={handleSubmit}>
-                                                <FieldArray name="paramLists">
-                                                    {() => (
-                                                        <Row className="g-3">
-                                                            {values.paramLists.map((social, index) => {
-                                                                const socialConfig = {
-                                                                    Twitter: { icon: 'bi-twitter', color: '#1DA1F2', placeholder: 'https://twitter.com/username' },
-                                                                    Facebook: { icon: 'bi-facebook', color: '#1877F2', placeholder: 'https://facebook.com/username' },
-                                                                    Youtube: { icon: 'bi-youtube', color: '#FF0000', placeholder: 'https://youtube.com/c/username' },
-                                                                    Vimeo: { icon: 'bi-vimeo', color: '#1AB7EA', placeholder: 'https://vimeo.com/username' },
-                                                                    Instagram: { icon: 'bi-instagram', color: '#E4405F', placeholder: 'https://instagram.com/username' },
-                                                                    LinkedIn: { icon: 'bi-linkedin', color: '#0A66C2', placeholder: 'https://linkedin.com/in/username' },
-                                                                    Pinterest: { icon: 'bi-pinterest', color: '#BD081C', placeholder: 'https://pinterest.com/username' }
-                                                                };
-                                                                const config = socialConfig[social.social_media] || {};
-                                                                return (
-                                                                    <Col md={6} key={index}>
-                                                                        <Card className={`h-100 ${styles.socialCard} ${values.paramLists[index].link ? styles.hasLink : ''}`}>
-                                                                            <Card.Body className="p-3">
-                                                                                <div className="d-flex align-items-center mb-3">
-                                                                                    <div className={styles.socialIcon} style={{ backgroundColor: config.color }}>
-                                                                                        <i className={`bi ${config.icon} text-white`}></i>
-                                                                                    </div>
-                                                                                    <div className="ms-3">
-                                                                                        <h6 className="mb-0 fw-bold">{social.social_media}</h6>
-                                                                                        <small className="text-muted">
-                                                                                            {values.paramLists[index].link ? 'Connected' : 'Not connected'}
-                                                                                        </small>
-                                                                                    </div>
-                                                                                </div>
-                                                                                <Form.Group>
-                                                                                    <Form.Label className="small fw-semibold mb-2">Profile URL</Form.Label>
-                                                                                    <div className="input-group">
-                                                                                        <span className="input-group-text bg-light">
-                                                                                            <i className={`bi ${config.icon} me-1`}></i>
-                                                                                        </span>
-                                                                                        <Field
-                                                                                            name={`paramLists.${index}.link`}
-                                                                                            type="url"
-                                                                                            className={`form-control ${errors.paramLists?.[index]?.link && touched.paramLists?.[index]?.link ? "is-invalid" : ""}`}
-                                                                                            placeholder={config.placeholder}
-                                                                                        />
-                                                                                    </div>
-                                                                                    <ErrorMessage name={`paramLists.${index}.link`} component="div" className="invalid-feedback" />
-                                                                                </Form.Group>
-                                                                                {values.paramLists[index].link && (
-                                                                                    <div className="mt-2">
-                                                                                        <a
-                                                                                            href={values.paramLists[index].link}
-                                                                                            target="_blank"
-                                                                                            rel="noopener noreferrer"
-                                                                                            className="btn btn-outline-primary btn-sm w-100"
-                                                                                        >
-                                                                                            <i className="bi bi-box-arrow-up-right me-1"></i>
-                                                                                            Visit Profile
-                                                                                        </a>
-                                                                                    </div>
-                                                                                )}
-                                                                            </Card.Body>
-                                                                        </Card>
-                                                                    </Col>
-                                                                );
-                                                            })}
-                                                        </Row>
-                                                    )}
-                                                </FieldArray>
-
-                                                <div className="d-flex gap-3 mt-4 pt-3 border-top">
-                                                    <Button type="submit" variant="primary" size="lg" disabled={isSubmitting} className="px-4 btn btn-primary">
-                                                        {isSubmitting ? (
-                                                            <><Spinner animation="border" size="sm" className="me-2" />Updating...</>
-                                                        ) : (
-                                                            <><i className="bi bi-check-circle me-2"></i>Update Social Links</>
-                                                        )}
-                                                    </Button>
-                                                    <Button type="button" variant="outline-secondary" size="lg" onClick={() => navigate('/')}>
-                                                        <i className="bi bi-arrow-left me-2"></i>Back to Home
-                                                    </Button>
-                                                </div>
-
-                                                {dirty && (
-                                                    <Card className="mt-4 border-warning">
-                                                        <Card.Body>
-                                                            <div className="d-flex align-items-center mb-2">
-                                                                <i className="bi bi-eye text-warning me-2"></i>
-                                                                <h6 className="mb-0 fw-semibold">Preview</h6>
-                                                            </div>
-                                                            <p className="text-muted small mb-3">This is how your social links will appear to others</p>
-                                                            <div className="d-flex flex-wrap gap-2">
-                                                                {values.paramLists.filter(social => social.link).map((social, index) => {
-                                                                    const socialConfig = {
-                                                                        Twitter: { icon: 'bi-twitter', color: '#1DA1F2' },
-                                                                        Facebook: { icon: 'bi-facebook', color: '#1877F2' },
-                                                                        Youtube: { icon: 'bi-youtube', color: '#FF0000' },
-                                                                        Vimeo: { icon: 'bi-vimeo', color: '#1AB7EA' },
-                                                                        Instagram: { icon: 'bi-instagram', color: '#E4405F' },
-                                                                        LinkedIn: { icon: 'bi-linkedin', color: '#0A66C2' },
-                                                                        Pinterest: { icon: 'bi-pinterest', color: '#BD081C' }
-                                                                    };
-                                                                    const config = socialConfig[social.social_media] || {};
-                                                                    return (
-                                                                        <a
-                                                                            key={index}
-                                                                            href={social.link}
-                                                                            target="_blank"
-                                                                            rel="noopener noreferrer"
-                                                                            className={`btn btn-sm ${styles.socialPreviewBtn}`}
-                                                                            style={{ borderColor: config.color, color: config.color }}
-                                                                            title={`Visit ${social.social_media}`}
-                                                                        >
-                                                                            <i className={`bi ${config.icon} me-1`}></i>
-                                                                            {social.social_media}
-                                                                        </a>
-                                                                    );
-                                                                })}
-                                                                {values.paramLists.filter(social => social.link).length === 0 && (
-                                                                    <span className="text-muted small">No social links added yet</span>
-                                                                )}
-                                                            </div>
-                                                        </Card.Body>
-                                                    </Card>
-                                                )}
-                                            </Form>
-                                        )}
-                                    </Formik>
-                                </div>
-                            )}
-
-                            {activeTab === 'settings' && (
-                                <div className={styles.tabContentInner}>
-                                    <h4 className={styles.tabTitle}>
-                                        <i className="bi bi-gear me-2"></i>
-                                        Settings
-                                    </h4>
-                                    <br />
-                                    <Formik
-                                        initialValues={{
-                                            notification_email: settings?.notification_email || false,
-                                            notification_sms: settings?.notification_sms || false,
-                                        }}
-                                        onSubmit={handleUpdateUserSettings}
-                                        enableReinitialize={true}
-                                    >
-                                        {({ errors, values, touched, isSubmitting, handleSubmit, setFieldValue }) => (
-                                            <Form onSubmit={handleSubmit}>
-                                                <div className="account-info-field-item">
-                                                    <label htmlFor="notification_sms" className="text-title-3">Notification SMS</label>
-                                                    <div>
-                                                        <label className="d-flex align-items-center gap-2 cursor-pointer">
-                                                            <span>Off</span>
-                                                            <Switch
-                                                                id="notification_sms"
-                                                                checked={values.notification_sms}
-                                                                onChange={(checked) => setFieldValue('notification_sms', checked)}
-                                                                aria-label="Toggle SMS notifications"
-                                                            />
-                                                            <span>On</span>
-                                                        </label>
-                                                    </div>
-                                                </div>
-                                                <div className="my-4" />
-                                                <div className="account-info-field-item">
-                                                    <label htmlFor="notification_email" className="text-title-3">Notification Email</label>
-                                                    <div>
-                                                        <label className="d-flex align-items-center gap-2 cursor-pointer">
-                                                            <span>Off</span>
-                                                            <Switch
-                                                                id="notification_email"
-                                                                checked={values.notification_email}
-                                                                onChange={(checked) => setFieldValue('notification_email', checked)}
-                                                                aria-label="Toggle email notifications"
-                                                            />
-                                                            <span>On</span>
-                                                        </label>
-                                                    </div>
-                                                </div>
-                                                <div className="my-4" />
-                                                <div className="d-flex gap-3">
-                                                    <Button type="submit" variant="primary" size="lg" disabled={isSubmitting} className="px-4" aria-label="Update notification settings">
-                                                        {isSubmitting ? (
-                                                            <><Spinner animation="border" size="sm" className="me-2" />Updating...</>
-                                                        ) : 'Update Settings'}
-                                                    </Button>
-                                                    <Button type="button" variant="outline-secondary" size="lg" onClick={() => navigate('/')} aria-label="Cancel and go back">
-                                                        Cancel
-                                                    </Button>
-                                                </div>
-                                            </Form>
-                                        )}
-                                    </Formik>
-                                </div>
-                            )}
-
-                            {activeTab === 'api' && (
-                                <div className={styles.tabContentInner}>
-                                    <h4 className={styles.tabTitle}>
-                                        <i className="bi bi-key me-2"></i>
-                                        My Projects
-                                    </h4>
-                                    <p className="text-muted mb-4">
-                                        Manage your API projects and credentials. Keep your client secret secure and never share it publicly.
-                                    </p>
-                                    <div className="d-flex justify-content-between align-items-center mb-4">
-                                        <h5 className="mb-0">API Projects</h5>
-                                        <Button variant="primary" size="sm" onClick={() => { setShowAppModal(true) }}>
-                                            <i className="bi bi-plus-circle me-2"></i>Create New Project
-                                        </Button>
-                                    </div>
-
-                                    {apps?.length > 0 ? (
-                                        <Row className="g-3">
-                                            {apps.map((project) => (
-                                                <Col md={6} lg={4} key={project?.id}>
-                                                    <Card className={`h-100 ${styles.apiProjectCard}`}>
-                                                        <Card.Body>
-                                                            <div className="d-flex justify-content-between align-items-start mb-3">
-                                                                <h6 className="fw-bold mb-0">{project?.name}</h6>
-                                                            </div>
-                                                            <div className={styles.apiCredentials}>
-                                                                <Form.Group className="mb-3">
-                                                                    <Form.Label className="small fw-semibold mb-1">
-                                                                        <i className="bi bi-key me-1"></i>Client ID
-                                                                    </Form.Label>
-                                                                    <div className="input-group input-group-sm">
-                                                                        <Form.Control type="text" value={project?.client_id} readOnly className="form-control-sm" />
-                                                                        <Button variant="outline-secondary" size="sm" onClick={() => navigator.clipboard.writeText(project?.client_id)}>
-                                                                            <i className="bi bi-clipboard"></i>
-                                                                        </Button>
-                                                                    </div>
-                                                                </Form.Group>
-                                                                <Form.Group className="mb-3">
-                                                                    <Form.Label className="small fw-semibold mb-1">
-                                                                        <i className="bi bi-shield-lock me-1"></i>Client Secret
-                                                                    </Form.Label>
-                                                                    <div className="input-group input-group-sm">
-                                                                        <Form.Control type="password" value={project?.client_secret} readOnly className="form-control-sm" />
-                                                                        <Button variant="outline-warning" size="sm" onClick={() => navigator.clipboard.writeText(project?.client_secret)}>
-                                                                            <i className="bi bi-clipboard"></i>
-                                                                        </Button>
-                                                                    </div>
-                                                                    <Form.Text className="text-warning">
-                                                                        <i className="bi bi-exclamation-triangle me-1"></i>Keep this secret secure
-                                                                    </Form.Text>
-                                                                </Form.Group>
-                                                            </div>
-                                                            <div className={styles.projectMeta}>
-                                                                <small className="text-muted">
-                                                                    <i className="bi bi-calendar me-1"></i>
-                                                                    Created: {moment(project?.createdAt).format("MMM Do, YYYY")}
-                                                                </small>
-                                                            </div>
-                                                        </Card.Body>
-                                                    </Card>
-                                                </Col>
-                                            ))}
-                                        </Row>
-                                    ) : (
-                                        <Card className="text-center py-5">
-                                            <Card.Body>
-                                                <i className="bi bi-key fa-3x text-muted mb-3"></i>
-                                                <h5 className="text-muted">No API Projects</h5>
-                                                <p className="text-muted mb-3">You haven't created any API projects yet.</p>
-                                                <Button variant="primary" onClick={() => { setShowAppModal(true) }}>
-                                                    <i className="bi bi-plus-circle me-2"></i>Create Your First Project
-                                                </Button>
-                                            </Card.Body>
-                                        </Card>
-                                    )}
-
-                                    <Card className="mt-4 border-info">
-                                        <Card.Body className="py-3">
-                                            <div className="d-flex align-items-center">
-                                                <i className="bi bi-info-circle text-info me-3 fa-lg"></i>
-                                                <div className="flex-grow-1">
-                                                    <h6 className="mb-1 fw-semibold">Need help with API integration?</h6>
-                                                    <p className="mb-0 small text-muted">Check out our API documentation for detailed guides and examples.</p>
-                                                </div>
-                                                <Button variant="outline-info" size="sm">
-                                                    <i className="bi bi-book me-2"></i>View Documentation
-                                                </Button>
-                                            </div>
-                                        </Card.Body>
-                                    </Card>
-                                </div>
-                            )}
-
-                            {activeTab === 'referrals' && (
-                                <div className={styles.tabContentInner}>
-                                    <h4 className={styles.tabTitle}>
-                                        <i className="bi bi-people me-2"></i>
-                                        Referral Program
-                                    </h4>
-                                    <div className="row">
-                                        <div className="col-12 mb-4">
-                                            <Card className={`${styles.referralHeaderCard} border-0 text-white`}>
-                                                <Card.Body className="text-center py-4">
-                                                    <div className="row align-items-center">
-                                                        <div className="col-md-8 text-md-start text-center">
-                                                            <h2 className="fw-bold mb-2">Share &amp; Earn $5</h2>
-                                                            <p className="mb-0 opacity-90">Invite friends and earn $5 in credits for each successful referral</p>
-                                                        </div>
-                                                        <div className="col-md-4 text-md-end text-center">
-                                                            <div className={styles.creditsDisplay}>
-                                                                <span className={styles.creditsLabel}>Total Earned</span>
-                                                                <h1 className={`${styles.creditsAmount} fw-bold`}>
-                                                                    ${profile?.credits_earned ? profile.credits_earned : 0}
-                                                                </h1>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </Card.Body>
-                                            </Card>
-                                        </div>
-
-                                        <div className="col-lg-8 mb-4">
-                                            <Card className={`${styles.referralCard} h-100`}>
-                                                <Card.Body className="p-4">
-                                                    <div className="row align-items-center">
-                                                        <div className="col-md-6 text-center mb-4 mb-md-0">
-                                                            <div className={styles.qrCodeContainer}>
-                                                                <QRCode
-                                                                    size={200}
-                                                                    style={{ height: "auto", maxWidth: "100%", width: "100%" }}
-                                                                    value={window.location.origin + "/register?referral=" + currentUser.user.referral_code}
-                                                                    viewBox={`0 0 256 256`}
-                                                                />
-                                                            </div>
-                                                            <p className="text-muted small mt-3">Scan to share your referral code</p>
-                                                        </div>
-                                                        <div className="col-md-6">
-                                                            <h5 className="fw-bold mb-3">Share Your Link</h5>
-                                                            <div className="mb-4">
-                                                                <Form.Label className="fw-semibold small text-muted mb-2">Your Personal Referral Link</Form.Label>
-                                                                <div className="input-group">
-                                                                    <Form.Control
-                                                                        type="text"
-                                                                        value={window.location.origin + "/register?referral=" + currentUser.user.referral_code}
-                                                                        readOnly
-                                                                        className={styles.referralInput}
-                                                                    />
-                                                                    <CopyToClipboard
-                                                                        text={window.location.origin + "/register?referral=" + currentUser.user.referral_code}
-                                                                        onCopy={() => { dispatch(setMessage({ message: 'Referral link copied to clipboard!', type: 'success' })); }}
-                                                                    >
-                                                                        <Button variant="primary" className={styles.copyButton}><i className="bi bi-clipboard me-2"></i>Copy</Button>
-                                                                    </CopyToClipboard>
-                                                                </div>
-                                                            </div>
-                                                            <div className="mb-4">
-                                                                <Form.Label className="fw-semibold small text-muted mb-2">Your Referral Code</Form.Label>
-                                                                <div className="input-group">
-                                                                    <Form.Control type="text" value={currentUser.user.referral_code} readOnly className={styles.referralInput} />
-                                                                    <CopyToClipboard
-                                                                        text={currentUser.user.referral_code}
-                                                                        onCopy={() => { dispatch(setMessage({ message: 'Referral code copied to clipboard!', type: 'success' })); }}
-                                                                    >
-                                                                        <Button variant="outline-primary" className={styles.copyButton}><i className="bi bi-clipboard me-2"></i>Copy</Button>
-                                                                    </CopyToClipboard>
-                                                                </div>
-                                                            </div>
-                                                            <div>
-                                                                <Form.Label className="fw-semibold small text-muted mb-2">Share via</Form.Label>
-                                                                <div className="d-flex gap-2 flex-wrap">
-                                                                    <Button variant="outline-primary" size="sm" onClick={() => { const text = `Join me on Collectly! Use my referral code: ${currentUser.user.referral_code}`; window.open(`https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}`, '_blank'); }}>
-                                                                        <i className="bi bi-twitter me-1"></i>Twitter
-                                                                    </Button>
-                                                                    <Button variant="outline-primary" size="sm" onClick={() => { const text = `Join me on Collectly! Use my referral code: ${currentUser.user.referral_code}`; window.open(`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(window.location.origin + '/register')}&quote=${encodeURIComponent(text)}`, '_blank'); }}>
-                                                                        <i className="bi bi-facebook me-1"></i>Facebook
-                                                                    </Button>
-                                                                    <Button variant="outline-primary" size="sm" onClick={() => { const text = `Join me on Collectly! Use my referral code ${currentUser.user.referral_code} to get started: ${window.location.origin}/register?referral=${currentUser.user.referral_code}`; navigator.clipboard.writeText(text); dispatch(setMessage({ message: 'Share message copied to clipboard!', type: 'success' })); }}>
-                                                                        <i className="bi bi-link-45deg me-1"></i>Copy Text
-                                                                    </Button>
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </Card.Body>
-                                            </Card>
-                                        </div>
-
-                                        <div className="col-lg-4 mb-4">
-                                            <Card className={`${styles.statsCard} h-100`}>
-                                                <Card.Body className="p-4">
-                                                    <h5 className="fw-bold mb-4">Referral Stats</h5>
-                                                    <div className={styles.statItem}>
-                                                        <div className={styles.statIcon}><i className="bi bi-people"></i></div>
-                                                        <div className={styles.statContent}>
-                                                            <div className={styles.statNumber}>{referrals?.length || 0}</div>
-                                                            <div className={styles.statLabel}>Total Referrals</div>
-                                                        </div>
-                                                    </div>
-                                                    <div className={styles.statItem}>
-                                                        <div className={styles.statIcon}><i className="bi bi-cash-coin"></i></div>
-                                                        <div className={styles.statContent}>
-                                                            <div className={styles.statNumber}>${profile?.credits_earned || 0}</div>
-                                                            <div className={styles.statLabel}>Total Earnings</div>
-                                                        </div>
-                                                    </div>
-                                                    <div className={styles.statItem}>
-                                                        <div className={styles.statIcon}><i className="bi bi-gift"></i></div>
-                                                        <div className={styles.statContent}>
-                                                            <div className={styles.statNumber}>$5</div>
-                                                            <div className={styles.statLabel}>Per Referral</div>
-                                                        </div>
-                                                    </div>
-                                                    <hr className="my-4" />
-                                                    <div className={styles.referralTips}>
-                                                        <h6 className="fw-semibold mb-3">Tips for Success</h6>
-                                                        <ul className="list-unstyled small">
-                                                            <li className="mb-2"><i className="bi bi-check-circle text-success me-2"></i>Share on social media</li>
-                                                            <li className="mb-2"><i className="bi bi-check-circle text-success me-2"></i>Send to friends &amp; family</li>
-                                                            <li className="mb-2"><i className="bi bi-check-circle text-success me-2"></i>Post in relevant communities</li>
-                                                            <li><i className="bi bi-check-circle text-success me-2"></i>Include in your email signature</li>
-                                                        </ul>
-                                                    </div>
-                                                </Card.Body>
-                                            </Card>
-                                        </div>
-
-                                        <div className="col-12">
-                                            <Card className={styles.referralsTableCard}>
-                                                <Card.Body className="p-0">
-                                                    <div className="p-4 border-bottom">
-                                                        <h5 className="fw-bold mb-0"><i className="bi bi-list-check me-2"></i>Referral History</h5>
-                                                    </div>
-                                                    <div className="table-responsive">
-                                                        <table className={`table table-hover mb-0 ${styles.referralsTable}`}>
-                                                            <thead className={styles.tableHeader}>
-                                                                <tr>
-                                                                    <th scope="col" className="ps-4">User</th>
-                                                                    <th scope="col">Status</th>
-                                                                    <th scope="col">Credits Earned</th>
-                                                                    <th scope="col">Referral Date</th>
-                                                                    <th scope="col" className="pe-4">Actions</th>
-                                                                </tr>
-                                                            </thead>
-                                                            <tbody>
-                                                                {referrals && referrals.length > 0 ? (
-                                                                    referrals.map((referral, index) => (
-                                                                        <tr key={referral.id} className={styles.referralRow}>
-                                                                            <td className="ps-4">
-                                                                                <div className="d-flex align-items-center">
-                                                                                    <div className={styles.userAvatar}>{referral.User?.firstName?.charAt(0)}{referral.User?.lastName?.charAt(0)}</div>
-                                                                                    <div className="ms-3">
-                                                                                        <div className="fw-semibold">{referral.User?.firstName} {referral.User?.lastName}</div>
-                                                                                        <small className="text-muted">{referral.User?.email}</small>
-                                                                                    </div>
-                                                                                </div>
-                                                                            </td>
-                                                                            <td><Badge bg={referral.credits > 0 ? "success" : "warning"} className={styles.statusBadge}>{referral.credits > 0 ? "Active" : "Pending"}</Badge></td>
-                                                                            <td><span className={`fw-bold ${styles.creditsText}`}>${referral.credits || 0}</span></td>
-                                                                            <td>
-                                                                                <div className="text-muted">{moment(new Date(referral.createdAt)).format('MMM Do, YYYY')}</div>
-                                                                                <small className="text-muted">{moment(new Date(referral.createdAt)).format('h:mm A')}</small>
-                                                                            </td>
-                                                                            <td className="pe-4">
-                                                                                <Button variant="outline-primary" size="sm" onClick={() => { dispatch(setMessage({ message: 'View user profile feature coming soon!', type: 'info' })); }}>
-                                                                                    <i className="bi bi-eye me-1"></i>View
-                                                                                </Button>
-                                                                            </td>
-                                                                        </tr>
-                                                                    ))
-                                                                ) : (
-                                                                    <tr>
-                                                                        <td colSpan="5" className="text-center py-5">
-                                                                            <div className={styles.emptyState}>
-                                                                                <i className="bi bi-people display-4 text-muted mb-3"></i>
-                                                                                <h5 className="text-muted">No referrals yet</h5>
-                                                                                <p className="text-muted mb-3">Start sharing your referral link to earn credits!</p>
-                                                                                <Button variant="primary" onClick={() => { const link = window.location.origin + "/register?referral=" + currentUser.user.referral_code; navigator.clipboard.writeText(link); dispatch(setMessage({ message: 'Referral link copied! Start sharing!', type: 'success' })); }}>
-                                                                                    <i className="bi bi-share me-2"></i>Copy Referral Link
-                                                                                </Button>
-                                                                            </div>
-                                                                        </td>
-                                                                    </tr>
-                                                                )}
-                                                            </tbody>
-                                                        </table>
-                                                    </div>
-                                                </Card.Body>
-                                            </Card>
-                                        </div>
-                                    </div>
-                                </div>
-                            )}
-
-                            {activeTab === 'identity' && (
-                                <div className={styles.tabContentInner}>
-                                    <h4 className={styles.tabTitle}>
-                                        <i className="bi bi-person-badge me-2"></i>
-                                        Identity Verification
-                                    </h4>
-                                    <div className="row">
-                                        <div className="col-lg-8 mb-4">
-                                            <Card className={`${styles.verificationCard} h-100`}>
-                                                <Card.Body className="p-4">
-                                                    <h5 className="fw-bold mb-4">Verification Status</h5>
-                                                    <div className={`${styles.verificationItem} ${identityVerificationStatus?.email ? styles.verified : styles.pending}`}>
-                                                        <div className={styles.verificationIcon}>
-                                                            <i className={`bi ${identityVerificationStatus?.email ? 'bi-check-circle-fill' : 'bi-envelope'} ${identityVerificationStatus?.email ? styles.verifiedIcon : styles.pendingIcon}`}></i>
-                                                        </div>
-                                                        <div className={styles.verificationContent}>
-                                                            <div className={styles.verificationTitle}>Email Verification</div>
-                                                            <div className={styles.verificationDescription}>
-                                                                {identityVerificationStatus?.email ? 'Your email address has been successfully verified' : 'Please verify your email address to secure your account'}
-                                                            </div>
-                                                        </div>
-                                                        <div className={styles.verificationStatus}>
-                                                            <Badge bg={identityVerificationStatus?.email ? "success" : "warning"} className={styles.statusBadge}>
-                                                                {identityVerificationStatus?.email ? "Verified" : "Pending"}
-                                                            </Badge>
-                                                        </div>
-                                                    </div>
-                                                    <div className={`${styles.verificationItem} ${styles.comingSoon}`}>
-                                                        <div className={styles.verificationIcon}><i className="bi bi-phone text-muted"></i></div>
-                                                        <div className={styles.verificationContent}>
-                                                            <div className={styles.verificationTitle}>Phone Verification</div>
-                                                            <div className={styles.verificationDescription}>Verify your phone number for additional security</div>
-                                                        </div>
-                                                        <div className={styles.verificationStatus}><Badge bg="secondary" className={styles.statusBadge}>Coming Soon</Badge></div>
-                                                    </div>
-                                                    <div className={`${styles.verificationItem} ${styles.comingSoon}`}>
-                                                        <div className={styles.verificationIcon}><i className="bi bi-id-card text-muted"></i></div>
-                                                        <div className={styles.verificationContent}>
-                                                            <div className={styles.verificationTitle}>ID Document Verification</div>
-                                                            <div className={styles.verificationDescription}>Upload government-issued ID for enhanced account features</div>
-                                                        </div>
-                                                        <div className={styles.verificationStatus}><Badge bg="secondary" className={styles.statusBadge}>Coming Soon</Badge></div>
-                                                    </div>
-                                                </Card.Body>
-                                            </Card>
-                                        </div>
-                                        <div className="col-lg-4 mb-4">
-                                            <Card className={`${styles.verificationBenefits} h-100`}>
-                                                <Card.Body className="p-4">
-                                                    <h5 className="fw-bold mb-3">Verification Benefits</h5>
-                                                    <div className={styles.benefitItem}><i className="bi bi-shield-check text-success me-2"></i><span>Enhanced account security</span></div>
-                                                    <div className={styles.benefitItem}><i className="bi bi-arrow-up-circle text-success me-2"></i><span>Higher contribution limits</span></div>
-                                                    <div className={styles.benefitItem}><i className="bi bi-lightning-charge text-success me-2"></i><span>Faster payout processing</span></div>
-                                                    <div className={styles.benefitItem}><i className="bi bi-star text-success me-2"></i><span>Access to premium features</span></div>
-                                                    <hr className="my-4" />
-                                                    <div className="d-grid gap-2">
-                                                        {!identityVerificationStatus?.email && (
-                                                            <Button variant="primary" size="lg" onClick={handleSendEmailVerification}>
-                                                                <i className="bi bi-envelope me-2"></i>Verify Email Address
-                                                            </Button>
-                                                        )}
-                                                        <Button variant="outline-secondary" size="sm" onClick={() => { dispatch(setMessage({ message: 'Additional verification methods coming soon!', type: 'info' })); }}>
-                                                            Learn More About Verification
-                                                        </Button>
-                                                    </div>
-                                                </Card.Body>
-                                            </Card>
-                                        </div>
-                                        <div className="col-12">
-                                            <Card className={styles.verificationProgress}>
-                                                <Card.Body className="p-4">
-                                                    <h5 className="fw-bold mb-3">Verification Progress</h5>
-                                                    <div className={styles.progressContainer}>
-                                                        <div className={styles.progressBar}>
-                                                            <div className={styles.progressFill} style={{ width: `${identityVerificationStatus?.email ? 25 : 0}%` }}></div>
-                                                        </div>
-                                                        <div className={styles.progressText}>{identityVerificationStatus?.email ? '25% Complete' : '0% Complete'}</div>
-                                                    </div>
-                                                    <div className="row text-center mt-4">
-                                                        <div className="col-md-3">
-                                                            <div className={styles.progressStep}>
-                                                                <div className={`${styles.stepIcon} ${identityVerificationStatus?.email ? styles.stepCompleted : ''}`}>
-                                                                    <i className={`bi ${identityVerificationStatus?.email ? 'bi-check' : 'bi-1'}`}></i>
-                                                                </div>
-                                                                <div className={styles.stepLabel}>Email</div>
-                                                                <div className={styles.stepStatus}>{identityVerificationStatus?.email ? 'Verified' : 'Pending'}</div>
-                                                            </div>
-                                                        </div>
-                                                        <div className="col-md-3">
-                                                            <div className={styles.progressStep}>
-                                                                <div className={styles.stepIcon}><i className="bi bi-2 text-muted"></i></div>
-                                                                <div className={styles.stepLabel}>Phone</div>
-                                                                <div className={styles.stepStatus}>Coming Soon</div>
-                                                            </div>
-                                                        </div>
-                                                        <div className="col-md-3">
-                                                            <div className={styles.progressStep}>
-                                                                <div className={styles.stepIcon}><i className="bi bi-3 text-muted"></i></div>
-                                                                <div className={styles.stepLabel}>ID Document</div>
-                                                                <div className={styles.stepStatus}>Coming Soon</div>
-                                                            </div>
-                                                        </div>
-                                                        <div className="col-md-3">
-                                                            <div className={styles.progressStep}>
-                                                                <div className={styles.stepIcon}><i className="bi bi-4 text-muted"></i></div>
-                                                                <div className={styles.stepLabel}>Complete</div>
-                                                                <div className={styles.stepStatus}>Locked</div>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </Card.Body>
-                                            </Card>
-                                        </div>
-                                    </div>
-                                </div>
-                            )}
-
-                            {activeTab === 'close' && (
-                                <div className={styles.tabContentInner}>
-                                    <h4 className={styles.tabTitle}>
-                                        <i className="bi bi-x-circle me-2"></i>
-                                        Account Closure
-                                    </h4>
-                                    <div className="row">
-                                        <div className="col-lg-8">
-                                            <Card className={`${styles.closeAccountCard} border-0`}>
-                                                <Card.Body className="p-4">
-                                                    {profile?.accountDeletionRequest && profile.accountDeletionRequest.length > 0 ? (
-                                                        <div className={styles.deletionStatus}>
-                                                            <div className="text-center mb-4">
-                                                                <div className={styles.statusIcon}><i className="bi bi-hourglass-split text-warning"></i></div>
-                                                                <h5 className="fw-bold text-warning mb-2">Account Deletion Pending</h5>
-                                                                <p className="text-muted">Your account deletion request is being processed. This usually takes 7-14 days to complete.</p>
-                                                            </div>
-                                                            <div className={styles.deletionDetails}>
-                                                                <h6 className="fw-semibold mb-3">Deletion Request Details</h6>
-                                                                <div className="row">
-                                                                    <div className="col-md-6 mb-3">
-                                                                        <div className={styles.detailItem}>
-                                                                            <span className={styles.detailLabel}>Request Date:</span>
-                                                                            <span className={styles.detailValue}>{moment(profile.accountDeletionRequest[0].createdAt).format('MMMM Do, YYYY')}</span>
-                                                                        </div>
-                                                                    </div>
-                                                                    <div className="col-md-6 mb-3">
-                                                                        <div className={styles.detailItem}>
-                                                                            <span className={styles.detailLabel}>Status:</span>
-                                                                            <span className={`badge bg-warning ${styles.statusBadge}`}>Pending Processing</span>
-                                                                        </div>
-                                                                    </div>
-                                                                    <div className="col-12 mb-3">
-                                                                        <div className={styles.detailItem}>
-                                                                            <span className={styles.detailLabel}>Request ID:</span>
-                                                                            <span className={styles.detailValue}>#{profile.accountDeletionRequest[0].id}</span>
-                                                                        </div>
-                                                                    </div>
-                                                                    {profile.accountDeletionRequest[0].comment && (
-                                                                        <div className="col-12">
-                                                                            <div className={styles.detailItem}>
-                                                                                <span className={styles.detailLabel}>Comment:</span>
-                                                                                <span className={styles.detailValue}>{profile.accountDeletionRequest[0].comment}</span>
-                                                                            </div>
-                                                                        </div>
-                                                                    )}
-                                                                </div>
-                                                            </div>
-                                                            <Alert variant="warning" className="mt-4">
-                                                                <Alert.Heading><i className="bi bi-exclamation-triangle me-2"></i>Important Information</Alert.Heading>
-                                                                <ul className="mb-0">
-                                                                    <li>Your account will be permanently deleted after processing</li>
-                                                                    <li>All your data, contributions, and history will be removed</li>
-                                                                    <li>This action cannot be undone</li>
-                                                                    <li>You will receive a confirmation email once processing is complete</li>
-                                                                </ul>
-                                                            </Alert>
-                                                        </div>
-                                                    ) : (
-                                                        <div className={styles.closeAccountContent}>
-                                                            <div className="text-center mb-4">
-                                                                <div className={styles.warningIcon}><i className="bi bi-exclamation-triangle"></i></div>
-                                                                <h5 className="fw-bold text-danger mb-3">Close Your Account</h5>
-                                                                <p className="text-muted mb-4">This action will permanently delete your account and all associated data. Please read the information below carefully before proceeding.</p>
-                                                            </div>
-                                                            <Card className="border-danger mb-4">
-                                                                <Card.Header className="bg-danger text-white">
-                                                                    <h6 className="mb-0"><i className="bi bi-shield-exclamation me-2"></i>What happens when you close your account</h6>
-                                                                </Card.Header>
-                                                                <Card.Body>
-                                                                    <ul className="list-unstyled mb-0">
-                                                                        <li className="mb-2"><i className="bi bi-x-circle text-danger me-2"></i>All your personal information will be permanently deleted</li>
-                                                                        <li className="mb-2"><i className="bi bi-x-circle text-danger me-2"></i>Your contribution history will be removed</li>
-                                                                        <li className="mb-2"><i className="bi bi-x-circle text-danger me-2"></i>Any active subscriptions will be cancelled</li>
-                                                                        <li className="mb-2"><i className="bi bi-x-circle text-danger me-2"></i>Your referral credits and earnings will be lost</li>
-                                                                        <li className="mb-2"><i className="bi bi-x-circle text-danger me-2"></i>API projects and credentials will be revoked</li>
-                                                                        <li><i className="bi bi-x-circle text-danger me-2"></i>This action cannot be undone</li>
-                                                                    </ul>
-                                                                </Card.Body>
-                                                            </Card>
-                                                            <Card className="border-info mb-4">
-                                                                <Card.Header className="bg-info text-white">
-                                                                    <h6 className="mb-0"><i className="bi bi-lightbulb me-2"></i>Consider these alternatives first</h6>
-                                                                </Card.Header>
-                                                                <Card.Body>
-                                                                    <div className="row">
-                                                                        <div className="col-md-6 mb-3">
-                                                                            <div className="d-flex align-items-start">
-                                                                                <i className="bi bi-bell text-info me-3 mt-1"></i>
-                                                                                <div><h6 className="fw-semibold mb-1">Adjust Notifications</h6><p className="small text-muted mb-0">Turn off email and SMS notifications in Settings</p></div>
-                                                                            </div>
-                                                                        </div>
-                                                                        <div className="col-md-6 mb-3">
-                                                                            <div className="d-flex align-items-start">
-                                                                                <i className="bi bi-shield-lock text-info me-3 mt-1"></i>
-                                                                                <div><h6 className="fw-semibold mb-1">Update Privacy</h6><p className="small text-muted mb-0">Adjust your privacy settings and social media links</p></div>
-                                                                            </div>
-                                                                        </div>
-                                                                        <div className="col-md-6 mb-3">
-                                                                            <div className="d-flex align-items-start">
-                                                                                <i className="bi bi-pause-circle text-info me-3 mt-1"></i>
-                                                                                <div><h6 className="fw-semibold mb-1">Temporary Break</h6><p className="small text-muted mb-0">Consider taking a break instead of permanent deletion</p></div>
-                                                                            </div>
-                                                                        </div>
-                                                                        <div className="col-md-6 mb-3">
-                                                                            <div className="d-flex align-items-start">
-                                                                                <i className="bi bi-headset text-info me-3 mt-1"></i>
-                                                                                <div><h6 className="fw-semibold mb-1">Contact Support</h6><p className="small text-muted mb-0">Reach out to our support team for assistance</p></div>
-                                                                            </div>
-                                                                        </div>
-                                                                    </div>
-                                                                </Card.Body>
-                                                            </Card>
-                                                            <Card className="border-danger">
-                                                                <Card.Header className="bg-light">
-                                                                    <h6 className="mb-0 text-danger"><i className="bi bi-trash me-2"></i>Request Account Deletion</h6>
-                                                                </Card.Header>
-                                                                <Card.Body>
-                                                                    <Formik
-                                                                        initialValues={{ confirmText: '', reason: '', password: '', understandConsequences: false }}
-                                                                        validationSchema={Yup.object().shape({
-                                                                            confirmText: Yup.string().matches(/^DELETE MY ACCOUNT$/, 'Please type "DELETE MY ACCOUNT" to confirm').required('Confirmation text is required'),
-                                                                            reason: Yup.string().required('Please provide a reason for deletion'),
-                                                                            password: Yup.string().required('Your password is required to confirm deletion'),
-                                                                            understandConsequences: Yup.boolean().oneOf([true], 'You must acknowledge the consequences')
-                                                                        })}
-                                                                        onSubmit={(values, { setSubmitting }) => { handleDeleteAccount(values); setSubmitting(false); }}
-                                                                    >
-                                                                        {({ errors, touched, isSubmitting, handleSubmit, values }) => (
-                                                                            <Form onSubmit={handleSubmit}>
-                                                                                <Form.Group className="mb-3">
-                                                                                    <Form.Label className="fw-semibold">Reason for leaving</Form.Label>
-                                                                                    <Field as="select" name="reason" className={`form-control ${errors.reason && touched.reason ? "is-invalid" : ""}`}>
-                                                                                        <option value="">Select a reason...</option>
-                                                                                        <option value="privacy_concerns">Privacy concerns</option>
-                                                                                        <option value="too_many_emails">Too many emails</option>
-                                                                                        <option value="found_better_alternative">Found a better alternative</option>
-                                                                                        <option value="technical_issues">Technical issues</option>
-                                                                                        <option value="customer_service">Customer service issues</option>
-                                                                                        <option value="other">Other</option>
-                                                                                    </Field>
-                                                                                    <ErrorMessage name="reason" component="div" className="invalid-feedback" />
-                                                                                </Form.Group>
-                                                                                <Form.Group className="mb-3">
-                                                                                    <Form.Label className="fw-semibold">Confirm Your Password</Form.Label>
-                                                                                    <Field name="password" type="password" className={`form-control ${errors.password && touched.password ? "is-invalid" : ""}`} placeholder="Enter your current password" />
-                                                                                    <ErrorMessage name="password" component="div" className="invalid-feedback" />
-                                                                                </Form.Group>
-                                                                                <Form.Group className="mb-3">
-                                                                                    <Form.Label className="fw-semibold">Type "DELETE MY ACCOUNT" to confirm</Form.Label>
-                                                                                    <Field name="confirmText" type="text" className={`form-control ${errors.confirmText && touched.confirmText ? "is-invalid" : ""}`} placeholder="DELETE MY ACCOUNT" />
-                                                                                    <ErrorMessage name="confirmText" component="div" className="invalid-feedback" />
-                                                                                </Form.Group>
-                                                                                <Form.Group className="mb-4">
-                                                                                    <div className="form-check">
-                                                                                        <Field name="understandConsequences" type="checkbox" className={`form-check-input ${errors.understandConsequences && touched.understandConsequences ? "is-invalid" : ""}`} id="understandConsequences" />
-                                                                                        <label className="form-check-label text-danger fw-semibold" htmlFor="understandConsequences">
-                                                                                            I understand that this action cannot be undone and all my data will be permanently deleted
-                                                                                        </label>
-                                                                                        <ErrorMessage name="understandConsequences" component="div" className="invalid-feedback" />
-                                                                                    </div>
-                                                                                </Form.Group>
-                                                                                <div className="d-grid">
-                                                                                    <Button variant="danger" size="lg" type="submit" disabled={isSubmitting || !values.understandConsequences} className="fw-semibold">
-                                                                                        {isSubmitting ? (
-                                                                                            <><Spinner animation="border" size="sm" className="me-2" />Processing Deletion Request...</>
-                                                                                        ) : (
-                                                                                            <><i className="bi bi-trash me-2"></i>Permanently Delete My Account</>
-                                                                                        )}
-                                                                                    </Button>
-                                                                                </div>
-                                                                            </Form>
-                                                                        )}
-                                                                    </Formik>
-                                                                </Card.Body>
-                                                            </Card>
-                                                        </div>
-                                                    )}
-                                                </Card.Body>
-                                            </Card>
-                                        </div>
-                                        <div className="col-lg-4">
-                                            <Card className="border-0">
-                                                <Card.Body className="p-4">
-                                                    <h6 className="fw-semibold mb-3"><i className="bi bi-question-circle me-2"></i>Need Help?</h6>
-                                                    <div className={styles.helpItem}><i className="bi bi-envelope text-primary me-2"></i><div><div className="fw-semibold">Email Support</div><small className="text-muted">support@collectly.com</small></div></div>
-                                                    <div className={styles.helpItem}><i className="bi bi-chat-dots text-primary me-2"></i><div><div className="fw-semibold">Live Chat</div><small className="text-muted">Available 24/7</small></div></div>
-                                                    <div className={styles.helpItem}><i className="bi bi-telephone text-primary me-2"></i><div><div className="fw-semibold">Phone Support</div><small className="text-muted">1-800-COLLECTLY</small></div></div>
-                                                    <hr className="my-3" />
-                                                    <div className="text-center">
-                                                        <Button variant="outline-primary" size="sm" onClick={() => { dispatch(setMessage({ message: 'Redirecting to support center...', type: 'info' })); setTimeout(() => navigate('/support'), 500); }}>
-                                                            <i className="bi bi-headset me-2"></i>Contact Support
-                                                        </Button>
-                                                    </div>
-                                                </Card.Body>
-                                            </Card>
-                                            {!profile?.accountDeletionRequest && (
-                                                <>
-                                                    <Card className="border-primary mt-4">
-                                                        <Card.Body className="p-4">
-                                                            <div className="text-center mb-3"><i className="bi bi-database text-primary display-6"></i></div>
-                                                            <h6 className="fw-semibold mb-3 text-center">Download Your Data</h6>
-                                                            <p className="small text-muted mb-3 text-center">Export all your personal data including profile information, contributions, and account activity.</p>
-                                                            <div className="d-grid gap-2">
-                                                                <Button variant="outline-primary" size="sm" className="w-100" onClick={handleDownloadPersonalData} disabled={isDownloadingData}>
-                                                                    {isDownloadingData ? (<><Spinner animation="border" size="sm" className="me-2" />Preparing Download...</>) : (<><i className="bi bi-download me-2"></i>Export My Data</>)}
-                                                                </Button>
-                                                                {downloadHistory.length > 0 && (
-                                                                    <div className="mt-3">
-                                                                        <h6 className="small fw-semibold mb-2">Recent Exports</h6>
-                                                                        {downloadHistory.slice(0, 3).map((item, index) => (
-                                                                            <div key={index} className="d-flex justify-content-between align-items-center small py-1">
-                                                                                <span className="text-muted">{moment(item.timestamp).format('MMM D, HH:mm')}</span>
-                                                                                <Badge bg={item.status === 'success' ? 'success' : item.status === 'error' ? 'danger' : 'warning'} className="ms-2">
-                                                                                    {item.status === 'success' ? 'Downloaded' : item.status === 'error' ? 'Failed' : 'Pending'}
-                                                                                </Badge>
-                                                                            </div>
-                                                                        ))}
-                                                                    </div>
-                                                                )}
-                                                            </div>
-                                                        </Card.Body>
-                                                    </Card>
-                                                    <Card className="border-info mt-3">
-                                                        <Card.Body className="p-3">
-                                                            <h6 className="fw-semibold mb-2"><i className="bi bi-info-circle me-2"></i>What's Included</h6>
-                                                            <ul className="small text-muted mb-0 ps-3">
-                                                                <li>Profile information</li>
-                                                                <li>Contribution history</li>
-                                                                <li>Payment records</li>
-                                                                <li>Social media links</li>
-                                                                <li>Account settings</li>
-                                                                <li>API project details</li>
-                                                            </ul>
-                                                        </Card.Body>
-                                                    </Card>
-                                                </>
-                                            )}
-                                        </div>
-                                    </div>
-                                </div>
-                            )}
-
-                            {!activeTab && (
-                                <div className={styles.tabContentInner}>
-                                    <p className="text-muted text-center py-4">Select a section above to get started.</p>
-                                </div>
-                            )}
-                        </div>
                     </div>
 
                     {/* Right Column */}
@@ -1874,6 +790,1093 @@ const Account = () => {
                         </div>
 
                     </div>
+
+                </div>
+
+                <br></br>
+
+                {/* More Settings — Secondary Tabs */}
+                <div className={styles.acCard}>
+                    <div className={styles.secondaryTabList}>
+                        {secondaryTabs.map(tab => (
+                            <button
+                                key={tab.key}
+                                className={`${styles.secondaryTab} ${activeTab === tab.key ? styles.secondaryTabActive : ''}`}
+                                onClick={() => setActiveTab(tab.key)}
+                            >
+                                {tab.label}
+                            </button>
+                        ))}
+                    </div>
+
+                    {/* Tab Content */}
+                    {activeTab === 'paypal' && (
+                        <div className={styles.tabContentInner}>
+                            <h4 className={styles.tabTitle}>
+                                <i className="bi bi-paypal me-2"></i>
+                                PayPal Settings
+                            </h4>
+                            <Formik
+                                enableReinitialize
+                                initialValues={{
+                                    payoutEmailAddress: payout?.payout_email_address || '',
+                                    payoutPayerID: payout?.payout_payer_id || '',
+                                }}
+                                validationSchema={Yup.object().shape({
+                                    payoutEmailAddress: Yup.string().required("Payout email address is required"),
+                                    payoutPayerID: Yup.string().required("Payout ID is required")
+                                })}
+                                onSubmit={handlePayoutSubmit}
+                            >
+                                {({ errors, touched, isSubmitting, handleSubmit }) => (
+                                    <Form onSubmit={handleSubmit}>
+                                        <Row>
+                                            <Col md={6} className="mb-3">
+                                                <Form.Group>
+                                                    <Form.Label className="fw-semibold">Paypal Email Address</Form.Label>
+                                                    <Field
+                                                        name="payoutEmailAddress"
+                                                        type="email"
+                                                        className={`form-control form-control-lg ${errors.payoutEmailAddress && touched.payoutEmailAddress ? "is-invalid" : ""}`}
+                                                    />
+                                                    <ErrorMessage name="payoutEmailAddress" component="div" className="invalid-feedback" />
+                                                </Form.Group>
+                                            </Col>
+                                            <Col md={6} className="mb-3">
+                                                <Form.Group>
+                                                    <Form.Label className="fw-semibold">Paypal PayerID</Form.Label>
+                                                    <Field
+                                                        name="payoutPayerID"
+                                                        type="text"
+                                                        className={`form-control form-control-lg ${errors.payoutPayerID && touched.payoutPayerID ? "is-invalid" : ""}`}
+                                                    />
+                                                    <ErrorMessage name="payoutPayerID" component="div" className="invalid-feedback" />
+                                                </Form.Group>
+                                            </Col>
+                                        </Row>
+                                        <div className="d-flex gap-3">
+                                            <Button type="submit" variant="primary" size="lg" disabled={isSubmitting} className="px-4">
+                                                {isSubmitting ? (
+                                                    <><Spinner animation="border" size="sm" className="me-2" />Updating...</>
+                                                ) : 'Update Payout'}
+                                            </Button>
+                                            <Button type="button" variant="outline-secondary" size="lg" onClick={() => navigate('/')}>
+                                                Cancel
+                                            </Button>
+                                        </div>
+                                    </Form>
+                                )}
+                            </Formik>
+                        </div>
+                    )}
+
+                    {activeTab === 'password' && (
+                        <div className={styles.tabContentInner}>
+                            <h4 className={styles.tabTitle}>
+                                <i className="bi bi-lock me-2"></i>
+                                Change Password
+                            </h4>
+                            <Formik
+                                initialValues={{
+                                    currentPassword: '',
+                                    newPassword: '',
+                                    confirmPassword: ''
+                                }}
+                                validationSchema={Yup.object().shape({
+                                    currentPassword: Yup.string().required("Current password is required"),
+                                    newPassword: Yup.string()
+                                        .min(8, "Password must be at least 8 characters")
+                                        .required("New password is required"),
+                                    confirmPassword: Yup.string()
+                                        .oneOf([Yup.ref('newPassword'), null], 'Passwords must match')
+                                        .required("Please confirm your password")
+                                })}
+                                onSubmit={handlePasswordSubmit}
+                            >
+                                {({ errors, touched, isSubmitting, handleSubmit }) => (
+                                    <Form onSubmit={handleSubmit} className={styles.maxW500}>
+                                        <Row>
+                                            <Col md={8} className="mb-3">
+                                                <Form.Group>
+                                                    <Form.Label className="fw-semibold">Current Password</Form.Label>
+                                                    <Field
+                                                        name="currentPassword"
+                                                        type="password"
+                                                        className={`form-control form-control-lg ${errors.currentPassword && touched.currentPassword ? "is-invalid" : ""}`}
+                                                    />
+                                                    <ErrorMessage name="currentPassword" component="div" className="invalid-feedback" />
+                                                </Form.Group>
+                                            </Col>
+                                        </Row>
+                                        <Row>
+                                            <Col md={8} className="mb-3">
+                                                <Form.Group>
+                                                    <Form.Label className="fw-semibold">New Password</Form.Label>
+                                                    <Field
+                                                        name="newPassword"
+                                                        type="password"
+                                                        className={`form-control form-control-lg ${errors.newPassword && touched.newPassword ? "is-invalid" : ""}`}
+                                                    />
+                                                    <ErrorMessage name="newPassword" component="div" className="invalid-feedback" />
+                                                </Form.Group>
+                                            </Col>
+                                        </Row>
+                                        <Row>
+                                            <Col md={8} className="mb-4">
+                                                <Form.Group>
+                                                    <Form.Label className="fw-semibold">Confirm New Password</Form.Label>
+                                                    <Field
+                                                        name="confirmPassword"
+                                                        type="password"
+                                                        className={`form-control form-control-lg ${errors.confirmPassword && touched.confirmPassword ? "is-invalid" : ""}`}
+                                                    />
+                                                    <ErrorMessage name="confirmPassword" component="div" className="invalid-feedback" />
+                                                </Form.Group>
+                                            </Col>
+                                        </Row>
+                                        <Button type="submit" variant="primary" size="lg" disabled={isSubmitting} className="px-4">
+                                            {isSubmitting ? (
+                                                <><Spinner animation="border" size="sm" className="me-2" />Changing...</>
+                                            ) : 'Change Password'}
+                                        </Button>
+                                    </Form>
+                                )}
+                            </Formik>
+                        </div>
+                    )}
+
+                    {activeTab === 'contributions' && (
+                        <div className={styles.tabContentInner}>
+                            <h4 className={styles.tabTitle}>
+                                <i className="bi bi-cash-stack me-2"></i>
+                                Contributions
+                            </h4>
+                            <div>
+                                <Table responsive>
+                                    <thead>
+                                        <tr>
+                                            <th>Pool</th>
+                                            <th>Amount</th>
+                                            <th>Transaction ID</th>
+                                            <th>Status</th>
+                                            <th>Created Date</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {contributions?.pagination?.totalItems > 0 ? (
+                                            contributions.transactions.map((item, index) => (
+                                                <tr key={item.id || index}>
+                                                    <td>{item?.Pool?.name || 'N/A'}</td>
+                                                    <td>${item?.amount || 0}</td>
+                                                    <td>{item?.transaction_id || 'N/A'}</td>
+                                                    <td>{item?.status || 'N/A'}</td>
+                                                    <td>{item?.createdAt ? moment(item.createdAt).format("dddd, Do MMMM YYYY, h:mm:ss A") : 'N/A'}</td>
+                                                </tr>
+                                            ))
+                                        ) : (
+                                            <tr>
+                                                <td colSpan="5" className="text-center text-muted">
+                                                    {contributions ? 'No contributions found' : 'Loading...'}
+                                                </td>
+                                            </tr>
+                                        )}
+                                    </tbody>
+                                </Table>
+
+                                {contributions?.pagination?.totalPages > 1 && (
+                                    <div className="d-flex justify-content-center mt-3">
+                                        <Pagination>
+                                            <Pagination.Prev
+                                                onClick={() => handlePageChangeContributionByUserId(contributions.pagination.currentPage - 1)}
+                                                disabled={contributions.pagination.currentPage === 1}
+                                            />
+                                            {Array.from({ length: contributions.pagination.totalPages }, (_, i) => i + 1).map((number) => (
+                                                <Pagination.Item
+                                                    key={number}
+                                                    active={number === contributions.pagination.currentPage}
+                                                    onClick={() => handlePageChangeContributionByUserId(number)}
+                                                >
+                                                    {number}
+                                                </Pagination.Item>
+                                            ))}
+                                            <Pagination.Next
+                                                onClick={() => handlePageChangeContributionByUserId(contributions.pagination.currentPage + 1)}
+                                                disabled={contributions.pagination.currentPage === contributions.pagination.totalPages}
+                                            />
+                                        </Pagination>
+                                    </div>
+                                )}
+                            </div>
+                        </div>
+                    )}
+
+                    {activeTab === 'social' && (
+                        <div className={styles.tabContentInner}>
+                            <h4 className={styles.tabTitle}>
+                                <i className="bi bi-share me-2"></i>
+                                Social Media Links
+                            </h4>
+                            <p className="text-muted mb-4">
+                                Connect your social media accounts to share content and grow your audience
+                            </p>
+
+                            <Formik
+                                initialValues={socialMediaInitialValues}
+                                onSubmit={handleSocialMediaLinkUpdate}
+                                enableReinitialize={true}
+                            >
+                                {({ errors, values, touched, isSubmitting, handleSubmit, isValid, dirty }) => (
+                                    <Form onSubmit={handleSubmit}>
+                                        <FieldArray name="paramLists">
+                                            {() => (
+                                                <Row className="g-3">
+                                                    {values.paramLists.map((social, index) => {
+                                                        const socialConfig = {
+                                                            Twitter: { icon: 'bi-twitter', color: '#1DA1F2', placeholder: 'https://twitter.com/username' },
+                                                            Facebook: { icon: 'bi-facebook', color: '#1877F2', placeholder: 'https://facebook.com/username' },
+                                                            Youtube: { icon: 'bi-youtube', color: '#FF0000', placeholder: 'https://youtube.com/c/username' },
+                                                            Vimeo: { icon: 'bi-vimeo', color: '#1AB7EA', placeholder: 'https://vimeo.com/username' },
+                                                            Instagram: { icon: 'bi-instagram', color: '#E4405F', placeholder: 'https://instagram.com/username' },
+                                                            LinkedIn: { icon: 'bi-linkedin', color: '#0A66C2', placeholder: 'https://linkedin.com/in/username' },
+                                                            Pinterest: { icon: 'bi-pinterest', color: '#BD081C', placeholder: 'https://pinterest.com/username' }
+                                                        };
+                                                        const config = socialConfig[social.social_media] || {};
+                                                        return (
+                                                            <Col md={6} key={index}>
+                                                                <Card className={`h-100 ${styles.socialCard} ${values.paramLists[index].link ? styles.hasLink : ''}`}>
+                                                                    <Card.Body className="p-3">
+                                                                        <div className="d-flex align-items-center mb-3">
+                                                                            <div className={styles.socialIcon} style={{ backgroundColor: config.color }}>
+                                                                                <i className={`bi ${config.icon} text-white`}></i>
+                                                                            </div>
+                                                                            <div className="ms-3">
+                                                                                <h6 className="mb-0 fw-bold">{social.social_media}</h6>
+                                                                                <small className="text-muted">
+                                                                                    {values.paramLists[index].link ? 'Connected' : 'Not connected'}
+                                                                                </small>
+                                                                            </div>
+                                                                        </div>
+                                                                        <Form.Group>
+                                                                            <Form.Label className="small fw-semibold mb-2">Profile URL</Form.Label>
+                                                                            <div className="input-group">
+                                                                                <span className="input-group-text bg-light">
+                                                                                    <i className={`bi ${config.icon} me-1`}></i>
+                                                                                </span>
+                                                                                <Field
+                                                                                    name={`paramLists.${index}.link`}
+                                                                                    type="url"
+                                                                                    className={`form-control ${errors.paramLists?.[index]?.link && touched.paramLists?.[index]?.link ? "is-invalid" : ""}`}
+                                                                                    placeholder={config.placeholder}
+                                                                                />
+                                                                            </div>
+                                                                            <ErrorMessage name={`paramLists.${index}.link`} component="div" className="invalid-feedback" />
+                                                                        </Form.Group>
+                                                                        {values.paramLists[index].link && (
+                                                                            <div className="mt-2">
+                                                                                <a
+                                                                                    href={values.paramLists[index].link}
+                                                                                    target="_blank"
+                                                                                    rel="noopener noreferrer"
+                                                                                    className="btn btn-outline-primary btn-sm w-100"
+                                                                                >
+                                                                                    <i className="bi bi-box-arrow-up-right me-1"></i>
+                                                                                    Visit Profile
+                                                                                </a>
+                                                                            </div>
+                                                                        )}
+                                                                    </Card.Body>
+                                                                </Card>
+                                                            </Col>
+                                                        );
+                                                    })}
+                                                </Row>
+                                            )}
+                                        </FieldArray>
+
+                                        <div className="d-flex gap-3 mt-4 pt-3 border-top">
+                                            <Button type="submit" variant="primary" size="lg" disabled={isSubmitting} className="px-4 btn btn-primary">
+                                                {isSubmitting ? (
+                                                    <><Spinner animation="border" size="sm" className="me-2" />Updating...</>
+                                                ) : (
+                                                    <><i className="bi bi-check-circle me-2"></i>Update Social Links</>
+                                                )}
+                                            </Button>
+                                            <Button type="button" variant="outline-secondary" size="lg" onClick={() => navigate('/')}>
+                                                <i className="bi bi-arrow-left me-2"></i>Back to Home
+                                            </Button>
+                                        </div>
+
+                                        {dirty && (
+                                            <Card className="mt-4 border-warning">
+                                                <Card.Body>
+                                                    <div className="d-flex align-items-center mb-2">
+                                                        <i className="bi bi-eye text-warning me-2"></i>
+                                                        <h6 className="mb-0 fw-semibold">Preview</h6>
+                                                    </div>
+                                                    <p className="text-muted small mb-3">This is how your social links will appear to others</p>
+                                                    <div className="d-flex flex-wrap gap-2">
+                                                        {values.paramLists.filter(social => social.link).map((social, index) => {
+                                                            const socialConfig = {
+                                                                Twitter: { icon: 'bi-twitter', color: '#1DA1F2' },
+                                                                Facebook: { icon: 'bi-facebook', color: '#1877F2' },
+                                                                Youtube: { icon: 'bi-youtube', color: '#FF0000' },
+                                                                Vimeo: { icon: 'bi-vimeo', color: '#1AB7EA' },
+                                                                Instagram: { icon: 'bi-instagram', color: '#E4405F' },
+                                                                LinkedIn: { icon: 'bi-linkedin', color: '#0A66C2' },
+                                                                Pinterest: { icon: 'bi-pinterest', color: '#BD081C' }
+                                                            };
+                                                            const config = socialConfig[social.social_media] || {};
+                                                            return (
+                                                                <a
+                                                                    key={index}
+                                                                    href={social.link}
+                                                                    target="_blank"
+                                                                    rel="noopener noreferrer"
+                                                                    className={`btn btn-sm ${styles.socialPreviewBtn}`}
+                                                                    style={{ borderColor: config.color, color: config.color }}
+                                                                    title={`Visit ${social.social_media}`}
+                                                                >
+                                                                    <i className={`bi ${config.icon} me-1`}></i>
+                                                                    {social.social_media}
+                                                                </a>
+                                                            );
+                                                        })}
+                                                        {values.paramLists.filter(social => social.link).length === 0 && (
+                                                            <span className="text-muted small">No social links added yet</span>
+                                                        )}
+                                                    </div>
+                                                </Card.Body>
+                                            </Card>
+                                        )}
+                                    </Form>
+                                )}
+                            </Formik>
+                        </div>
+                    )}
+
+                    {activeTab === 'settings' && (
+                        <div className={styles.tabContentInner}>
+                            <h4 className={styles.tabTitle}>
+                                <i className="bi bi-gear me-2"></i>
+                                Settings
+                            </h4>
+                            <br />
+                            <Formik
+                                initialValues={{
+                                    notification_email: settings?.notification_email || false,
+                                    notification_sms: settings?.notification_sms || false,
+                                }}
+                                onSubmit={handleUpdateUserSettings}
+                                enableReinitialize={true}
+                            >
+                                {({ errors, values, touched, isSubmitting, handleSubmit, setFieldValue }) => (
+                                    <Form onSubmit={handleSubmit}>
+                                        <div className="account-info-field-item">
+                                            <label htmlFor="notification_sms" className="text-title-3">Notification SMS</label>
+                                            <div>
+                                                <label className="d-flex align-items-center gap-2 cursor-pointer">
+                                                    <span>Off</span>
+                                                    <Switch
+                                                        id="notification_sms"
+                                                        checked={values.notification_sms}
+                                                        onChange={(checked) => setFieldValue('notification_sms', checked)}
+                                                        aria-label="Toggle SMS notifications"
+                                                    />
+                                                    <span>On</span>
+                                                </label>
+                                            </div>
+                                        </div>
+                                        <div className="my-4" />
+                                        <div className="account-info-field-item">
+                                            <label htmlFor="notification_email" className="text-title-3">Notification Email</label>
+                                            <div>
+                                                <label className="d-flex align-items-center gap-2 cursor-pointer">
+                                                    <span>Off</span>
+                                                    <Switch
+                                                        id="notification_email"
+                                                        checked={values.notification_email}
+                                                        onChange={(checked) => setFieldValue('notification_email', checked)}
+                                                        aria-label="Toggle email notifications"
+                                                    />
+                                                    <span>On</span>
+                                                </label>
+                                            </div>
+                                        </div>
+                                        <div className="my-4" />
+                                        <div className="d-flex gap-3">
+                                            <Button type="submit" variant="primary" size="lg" disabled={isSubmitting} className="px-4" aria-label="Update notification settings">
+                                                {isSubmitting ? (
+                                                    <><Spinner animation="border" size="sm" className="me-2" />Updating...</>
+                                                ) : 'Update Settings'}
+                                            </Button>
+                                            <Button type="button" variant="outline-secondary" size="lg" onClick={() => navigate('/')} aria-label="Cancel and go back">
+                                                Cancel
+                                            </Button>
+                                        </div>
+                                    </Form>
+                                )}
+                            </Formik>
+                        </div>
+                    )}
+
+                    {activeTab === 'api' && (
+                        <div className={styles.tabContentInner}>
+                            <h4 className={styles.tabTitle}>
+                                <i className="bi bi-key me-2"></i>
+                                My Projects
+                            </h4>
+                            <p className="text-muted mb-4">
+                                Manage your API projects and credentials. Keep your client secret secure and never share it publicly.
+                            </p>
+                            <div className="d-flex justify-content-between align-items-center mb-4">
+                                <h5 className="mb-0">API Projects</h5>
+                                <Button variant="primary" size="sm" onClick={() => { setShowAppModal(true) }}>
+                                    <i className="bi bi-plus-circle me-2"></i>Create New Project
+                                </Button>
+                            </div>
+
+                            {apps?.length > 0 ? (
+                                <Row className="g-3">
+                                    {apps.map((project) => (
+                                        <Col md={6} lg={4} key={project?.id}>
+                                            <Card className={`h-100 ${styles.apiProjectCard}`}>
+                                                <Card.Body>
+                                                    <div className="d-flex justify-content-between align-items-start mb-3">
+                                                        <h6 className="fw-bold mb-0">{project?.name}</h6>
+                                                    </div>
+                                                    <div className={styles.apiCredentials}>
+                                                        <Form.Group className="mb-3">
+                                                            <Form.Label className="small fw-semibold mb-1">
+                                                                <i className="bi bi-key me-1"></i>Client ID
+                                                            </Form.Label>
+                                                            <div className="input-group input-group-sm">
+                                                                <Form.Control type="text" value={project?.client_id} readOnly className="form-control-sm" />
+                                                                <Button variant="outline-secondary" size="sm" onClick={() => navigator.clipboard.writeText(project?.client_id)}>
+                                                                    <i className="bi bi-clipboard"></i>
+                                                                </Button>
+                                                            </div>
+                                                        </Form.Group>
+                                                        <Form.Group className="mb-3">
+                                                            <Form.Label className="small fw-semibold mb-1">
+                                                                <i className="bi bi-shield-lock me-1"></i>Client Secret
+                                                            </Form.Label>
+                                                            <div className="input-group input-group-sm">
+                                                                <Form.Control type="password" value={project?.client_secret} readOnly className="form-control-sm" />
+                                                                <Button variant="outline-warning" size="sm" onClick={() => navigator.clipboard.writeText(project?.client_secret)}>
+                                                                    <i className="bi bi-clipboard"></i>
+                                                                </Button>
+                                                            </div>
+                                                            <Form.Text className="text-warning">
+                                                                <i className="bi bi-exclamation-triangle me-1"></i>Keep this secret secure
+                                                            </Form.Text>
+                                                        </Form.Group>
+                                                    </div>
+                                                    <div className={styles.projectMeta}>
+                                                        <small className="text-muted">
+                                                            <i className="bi bi-calendar me-1"></i>
+                                                            Created: {moment(project?.createdAt).format("MMM Do, YYYY")}
+                                                        </small>
+                                                    </div>
+                                                </Card.Body>
+                                            </Card>
+                                        </Col>
+                                    ))}
+                                </Row>
+                            ) : (
+                                <Card className="text-center py-5">
+                                    <Card.Body>
+                                        <i className="bi bi-key fa-3x text-muted mb-3"></i>
+                                        <h5 className="text-muted">No API Projects</h5>
+                                        <p className="text-muted mb-3">You haven't created any API projects yet.</p>
+                                        <Button variant="primary" onClick={() => { setShowAppModal(true) }}>
+                                            <i className="bi bi-plus-circle me-2"></i>Create Your First Project
+                                        </Button>
+                                    </Card.Body>
+                                </Card>
+                            )}
+
+                            <Card className="mt-4 border-info">
+                                <Card.Body className="py-3">
+                                    <div className="d-flex align-items-center">
+                                        <i className="bi bi-info-circle text-info me-3 fa-lg"></i>
+                                        <div className="flex-grow-1">
+                                            <h6 className="mb-1 fw-semibold">Need help with API integration?</h6>
+                                            <p className="mb-0 small text-muted">Check out our API documentation for detailed guides and examples.</p>
+                                        </div>
+                                        <Button variant="outline-info" size="sm">
+                                            <i className="bi bi-book me-2"></i>View Documentation
+                                        </Button>
+                                    </div>
+                                </Card.Body>
+                            </Card>
+                        </div>
+                    )}
+
+                    {activeTab === 'referrals' && (
+                        <div className={styles.tabContentInner}>
+                            <h4 className={styles.tabTitle}>
+                                <i className="bi bi-people me-2"></i>
+                                Referral Program
+                            </h4>
+                            <div className="row">
+                                <div className="col-12 mb-4">
+                                    <Card className={`${styles.referralHeaderCard} border-0 text-white`}>
+                                        <Card.Body className="text-center py-4">
+                                            <div className="row align-items-center">
+                                                <div className="col-md-8 text-md-start text-center">
+                                                    <h2 className="fw-bold mb-2">Share &amp; Earn $5</h2>
+                                                    <p className="mb-0 opacity-90">Invite friends and earn $5 in credits for each successful referral</p>
+                                                </div>
+                                                <div className="col-md-4 text-md-end text-center">
+                                                    <div className={styles.creditsDisplay}>
+                                                        <span className={styles.creditsLabel}>Total Earned</span>
+                                                        <h1 className={`${styles.creditsAmount} fw-bold`}>
+                                                            ${profile?.credits_earned ? profile.credits_earned : 0}
+                                                        </h1>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </Card.Body>
+                                    </Card>
+                                </div>
+
+                                <div className="col-lg-8 mb-4">
+                                    <Card className={`${styles.referralCard} h-100`}>
+                                        <Card.Body className="p-4">
+                                            <div className="row align-items-center">
+                                                <div className="col-md-6 text-center mb-4 mb-md-0">
+                                                    <div className={styles.qrCodeContainer}>
+                                                        <QRCode
+                                                            size={200}
+                                                            style={{ height: "auto", maxWidth: "100%", width: "100%" }}
+                                                            value={window.location.origin + "/register?referral=" + currentUser.user.referral_code}
+                                                            viewBox={`0 0 256 256`}
+                                                        />
+                                                    </div>
+                                                    <p className="text-muted small mt-3">Scan to share your referral code</p>
+                                                </div>
+                                                <div className="col-md-6">
+                                                    <h5 className="fw-bold mb-3">Share Your Link</h5>
+                                                    <div className="mb-4">
+                                                        <Form.Label className="fw-semibold small text-muted mb-2">Your Personal Referral Link</Form.Label>
+                                                        <div className="input-group">
+                                                            <Form.Control
+                                                                type="text"
+                                                                value={window.location.origin + "/register?referral=" + currentUser.user.referral_code}
+                                                                readOnly
+                                                                className={styles.referralInput}
+                                                            />
+                                                            <CopyToClipboard
+                                                                text={window.location.origin + "/register?referral=" + currentUser.user.referral_code}
+                                                                onCopy={() => { dispatch(setMessage({ message: 'Referral link copied to clipboard!', type: 'success' })); }}
+                                                            >
+                                                                <Button variant="primary" className={styles.copyButton}><i className="bi bi-clipboard me-2"></i>Copy</Button>
+                                                            </CopyToClipboard>
+                                                        </div>
+                                                    </div>
+                                                    <div className="mb-4">
+                                                        <Form.Label className="fw-semibold small text-muted mb-2">Your Referral Code</Form.Label>
+                                                        <div className="input-group">
+                                                            <Form.Control type="text" value={currentUser.user.referral_code} readOnly className={styles.referralInput} />
+                                                            <CopyToClipboard
+                                                                text={currentUser.user.referral_code}
+                                                                onCopy={() => { dispatch(setMessage({ message: 'Referral code copied to clipboard!', type: 'success' })); }}
+                                                            >
+                                                                <Button variant="outline-primary" className={styles.copyButton}><i className="bi bi-clipboard me-2"></i>Copy</Button>
+                                                            </CopyToClipboard>
+                                                        </div>
+                                                    </div>
+                                                    <div>
+                                                        <Form.Label className="fw-semibold small text-muted mb-2">Share via</Form.Label>
+                                                        <div className="d-flex gap-2 flex-wrap">
+                                                            <Button variant="outline-primary" size="sm" onClick={() => { const text = `Join me on Collectly! Use my referral code: ${currentUser.user.referral_code}`; window.open(`https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}`, '_blank'); }}>
+                                                                <i className="bi bi-twitter me-1"></i>Twitter
+                                                            </Button>
+                                                            <Button variant="outline-primary" size="sm" onClick={() => { const text = `Join me on Collectly! Use my referral code: ${currentUser.user.referral_code}`; window.open(`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(window.location.origin + '/register')}&quote=${encodeURIComponent(text)}`, '_blank'); }}>
+                                                                <i className="bi bi-facebook me-1"></i>Facebook
+                                                            </Button>
+                                                            <Button variant="outline-primary" size="sm" onClick={() => { const text = `Join me on Collectly! Use my referral code ${currentUser.user.referral_code} to get started: ${window.location.origin}/register?referral=${currentUser.user.referral_code}`; navigator.clipboard.writeText(text); dispatch(setMessage({ message: 'Share message copied to clipboard!', type: 'success' })); }}>
+                                                                <i className="bi bi-link-45deg me-1"></i>Copy Text
+                                                            </Button>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </Card.Body>
+                                    </Card>
+                                </div>
+
+                                <div className="col-lg-4 mb-4">
+                                    <Card className={`${styles.statsCard} h-100`}>
+                                        <Card.Body className="p-4">
+                                            <h5 className="fw-bold mb-4">Referral Stats</h5>
+                                            <div className={styles.statItem}>
+                                                <div className={styles.statIcon}><i className="bi bi-people"></i></div>
+                                                <div className={styles.statContent}>
+                                                    <div className={styles.statNumber}>{referrals?.length || 0}</div>
+                                                    <div className={styles.statLabel}>Total Referrals</div>
+                                                </div>
+                                            </div>
+                                            <div className={styles.statItem}>
+                                                <div className={styles.statIcon}><i className="bi bi-cash-coin"></i></div>
+                                                <div className={styles.statContent}>
+                                                    <div className={styles.statNumber}>${profile?.credits_earned || 0}</div>
+                                                    <div className={styles.statLabel}>Total Earnings</div>
+                                                </div>
+                                            </div>
+                                            <div className={styles.statItem}>
+                                                <div className={styles.statIcon}><i className="bi bi-gift"></i></div>
+                                                <div className={styles.statContent}>
+                                                    <div className={styles.statNumber}>$5</div>
+                                                    <div className={styles.statLabel}>Per Referral</div>
+                                                </div>
+                                            </div>
+                                            <hr className="my-4" />
+                                            <div className={styles.referralTips}>
+                                                <h6 className="fw-semibold mb-3">Tips for Success</h6>
+                                                <ul className="list-unstyled small">
+                                                    <li className="mb-2"><i className="bi bi-check-circle text-success me-2"></i>Share on social media</li>
+                                                    <li className="mb-2"><i className="bi bi-check-circle text-success me-2"></i>Send to friends &amp; family</li>
+                                                    <li className="mb-2"><i className="bi bi-check-circle text-success me-2"></i>Post in relevant communities</li>
+                                                    <li><i className="bi bi-check-circle text-success me-2"></i>Include in your email signature</li>
+                                                </ul>
+                                            </div>
+                                        </Card.Body>
+                                    </Card>
+                                </div>
+
+                                <div className="col-12">
+                                    <Card className={styles.referralsTableCard}>
+                                        <Card.Body className="p-0">
+                                            <div className="p-4 border-bottom">
+                                                <h5 className="fw-bold mb-0"><i className="bi bi-list-check me-2"></i>Referral History</h5>
+                                            </div>
+                                            <div className="table-responsive">
+                                                <table className={`table table-hover mb-0 ${styles.referralsTable}`}>
+                                                    <thead className={styles.tableHeader}>
+                                                        <tr>
+                                                            <th scope="col" className="ps-4">User</th>
+                                                            <th scope="col">Status</th>
+                                                            <th scope="col">Credits Earned</th>
+                                                            <th scope="col">Referral Date</th>
+                                                            <th scope="col" className="pe-4">Actions</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                        {referrals && referrals.length > 0 ? (
+                                                            referrals.map((referral, index) => (
+                                                                <tr key={referral.id} className={styles.referralRow}>
+                                                                    <td className="ps-4">
+                                                                        <div className="d-flex align-items-center">
+                                                                            <div className={styles.userAvatar}>{referral.User?.firstName?.charAt(0)}{referral.User?.lastName?.charAt(0)}</div>
+                                                                            <div className="ms-3">
+                                                                                <div className="fw-semibold">{referral.User?.firstName} {referral.User?.lastName}</div>
+                                                                                <small className="text-muted">{referral.User?.email}</small>
+                                                                            </div>
+                                                                        </div>
+                                                                    </td>
+                                                                    <td><Badge bg={referral.credits > 0 ? "success" : "warning"} className={styles.statusBadge}>{referral.credits > 0 ? "Active" : "Pending"}</Badge></td>
+                                                                    <td><span className={`fw-bold ${styles.creditsText}`}>${referral.credits || 0}</span></td>
+                                                                    <td>
+                                                                        <div className="text-muted">{moment(new Date(referral.createdAt)).format('MMM Do, YYYY')}</div>
+                                                                        <small className="text-muted">{moment(new Date(referral.createdAt)).format('h:mm A')}</small>
+                                                                    </td>
+                                                                    <td className="pe-4">
+                                                                        <Button variant="outline-primary" size="sm" onClick={() => { dispatch(setMessage({ message: 'View user profile feature coming soon!', type: 'info' })); }}>
+                                                                            <i className="bi bi-eye me-1"></i>View
+                                                                        </Button>
+                                                                    </td>
+                                                                </tr>
+                                                            ))
+                                                        ) : (
+                                                            <tr>
+                                                                <td colSpan="5" className="text-center py-5">
+                                                                    <div className={styles.emptyState}>
+                                                                        <i className="bi bi-people display-4 text-muted mb-3"></i>
+                                                                        <h5 className="text-muted">No referrals yet</h5>
+                                                                        <p className="text-muted mb-3">Start sharing your referral link to earn credits!</p>
+                                                                        <Button variant="primary" onClick={() => { const link = window.location.origin + "/register?referral=" + currentUser.user.referral_code; navigator.clipboard.writeText(link); dispatch(setMessage({ message: 'Referral link copied! Start sharing!', type: 'success' })); }}>
+                                                                            <i className="bi bi-share me-2"></i>Copy Referral Link
+                                                                        </Button>
+                                                                    </div>
+                                                                </td>
+                                                            </tr>
+                                                        )}
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        </Card.Body>
+                                    </Card>
+                                </div>
+                            </div>
+                        </div>
+                    )}
+
+                    {activeTab === 'identity' && (
+                        <div className={styles.tabContentInner}>
+                            <h4 className={styles.tabTitle}>
+                                <i className="bi bi-person-badge me-2"></i>
+                                Identity Verification
+                            </h4>
+                            <div className="row">
+                                <div className="col-lg-8 mb-4">
+                                    <Card className={`${styles.verificationCard} h-100`}>
+                                        <Card.Body className="p-4">
+                                            <h5 className="fw-bold mb-4">Verification Status</h5>
+                                            <div className={`${styles.verificationItem} ${identityVerificationStatus?.email ? styles.verified : styles.pending}`}>
+                                                <div className={styles.verificationIcon}>
+                                                    <i className={`bi ${identityVerificationStatus?.email ? 'bi-check-circle-fill' : 'bi-envelope'} ${identityVerificationStatus?.email ? styles.verifiedIcon : styles.pendingIcon}`}></i>
+                                                </div>
+                                                <div className={styles.verificationContent}>
+                                                    <div className={styles.verificationTitle}>Email Verification</div>
+                                                    <div className={styles.verificationDescription}>
+                                                        {identityVerificationStatus?.email ? 'Your email address has been successfully verified' : 'Please verify your email address to secure your account'}
+                                                    </div>
+                                                </div>
+                                                <div className={styles.verificationStatus}>
+                                                    <Badge bg={identityVerificationStatus?.email ? "success" : "warning"} className={styles.statusBadge}>
+                                                        {identityVerificationStatus?.email ? "Verified" : "Pending"}
+                                                    </Badge>
+                                                </div>
+                                            </div>
+                                            <div className={`${styles.verificationItem} ${styles.comingSoon}`}>
+                                                <div className={styles.verificationIcon}><i className="bi bi-phone text-muted"></i></div>
+                                                <div className={styles.verificationContent}>
+                                                    <div className={styles.verificationTitle}>Phone Verification</div>
+                                                    <div className={styles.verificationDescription}>Verify your phone number for additional security</div>
+                                                </div>
+                                                <div className={styles.verificationStatus}><Badge bg="secondary" className={styles.statusBadge}>Coming Soon</Badge></div>
+                                            </div>
+                                            <div className={`${styles.verificationItem} ${styles.comingSoon}`}>
+                                                <div className={styles.verificationIcon}><i className="bi bi-id-card text-muted"></i></div>
+                                                <div className={styles.verificationContent}>
+                                                    <div className={styles.verificationTitle}>ID Document Verification</div>
+                                                    <div className={styles.verificationDescription}>Upload government-issued ID for enhanced account features</div>
+                                                </div>
+                                                <div className={styles.verificationStatus}><Badge bg="secondary" className={styles.statusBadge}>Coming Soon</Badge></div>
+                                            </div>
+                                        </Card.Body>
+                                    </Card>
+                                </div>
+                                <div className="col-lg-4 mb-4">
+                                    <Card className={`${styles.verificationBenefits} h-100`}>
+                                        <Card.Body className="p-4">
+                                            <h5 className="fw-bold mb-3">Verification Benefits</h5>
+                                            <div className={styles.benefitItem}><i className="bi bi-shield-check text-success me-2"></i><span>Enhanced account security</span></div>
+                                            <div className={styles.benefitItem}><i className="bi bi-arrow-up-circle text-success me-2"></i><span>Higher contribution limits</span></div>
+                                            <div className={styles.benefitItem}><i className="bi bi-lightning-charge text-success me-2"></i><span>Faster payout processing</span></div>
+                                            <div className={styles.benefitItem}><i className="bi bi-star text-success me-2"></i><span>Access to premium features</span></div>
+                                            <hr className="my-4" />
+                                            <div className="d-grid gap-2">
+                                                {!identityVerificationStatus?.email && (
+                                                    <Button variant="primary" size="lg" onClick={handleSendEmailVerification}>
+                                                        <i className="bi bi-envelope me-2"></i>Verify Email Address
+                                                    </Button>
+                                                )}
+                                                <Button variant="outline-secondary" size="sm" onClick={() => { dispatch(setMessage({ message: 'Additional verification methods coming soon!', type: 'info' })); }}>
+                                                    Learn More About Verification
+                                                </Button>
+                                            </div>
+                                        </Card.Body>
+                                    </Card>
+                                </div>
+                                <div className="col-12">
+                                    <Card className={styles.verificationProgress}>
+                                        <Card.Body className="p-4">
+                                            <h5 className="fw-bold mb-3">Verification Progress</h5>
+                                            <div className={styles.progressContainer}>
+                                                <div className={styles.progressBar}>
+                                                    <div className={styles.progressFill} style={{ width: `${identityVerificationStatus?.email ? 25 : 0}%` }}></div>
+                                                </div>
+                                                <div className={styles.progressText}>{identityVerificationStatus?.email ? '25% Complete' : '0% Complete'}</div>
+                                            </div>
+                                            <div className="row text-center mt-4">
+                                                <div className="col-md-3">
+                                                    <div className={styles.progressStep}>
+                                                        <div className={`${styles.stepIcon} ${identityVerificationStatus?.email ? styles.stepCompleted : ''}`}>
+                                                            <i className={`bi ${identityVerificationStatus?.email ? 'bi-check' : 'bi-1'}`}></i>
+                                                        </div>
+                                                        <div className={styles.stepLabel}>Email</div>
+                                                        <div className={styles.stepStatus}>{identityVerificationStatus?.email ? 'Verified' : 'Pending'}</div>
+                                                    </div>
+                                                </div>
+                                                <div className="col-md-3">
+                                                    <div className={styles.progressStep}>
+                                                        <div className={styles.stepIcon}><i className="bi bi-2 text-muted"></i></div>
+                                                        <div className={styles.stepLabel}>Phone</div>
+                                                        <div className={styles.stepStatus}>Coming Soon</div>
+                                                    </div>
+                                                </div>
+                                                <div className="col-md-3">
+                                                    <div className={styles.progressStep}>
+                                                        <div className={styles.stepIcon}><i className="bi bi-3 text-muted"></i></div>
+                                                        <div className={styles.stepLabel}>ID Document</div>
+                                                        <div className={styles.stepStatus}>Coming Soon</div>
+                                                    </div>
+                                                </div>
+                                                <div className="col-md-3">
+                                                    <div className={styles.progressStep}>
+                                                        <div className={styles.stepIcon}><i className="bi bi-4 text-muted"></i></div>
+                                                        <div className={styles.stepLabel}>Complete</div>
+                                                        <div className={styles.stepStatus}>Locked</div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </Card.Body>
+                                    </Card>
+                                </div>
+                            </div>
+                        </div>
+                    )}
+
+                    {activeTab === 'close' && (
+                        <div className={styles.tabContentInner}>
+                            <h4 className={styles.tabTitle}>
+                                <i className="bi bi-x-circle me-2"></i>
+                                Account Closure
+                            </h4>
+                            <div className="row">
+                                <div className="col-lg-8">
+                                    <Card className={`${styles.closeAccountCard} border-0`}>
+                                        <Card.Body className="p-4">
+                                            {profile?.accountDeletionRequest && profile.accountDeletionRequest.length > 0 ? (
+                                                <div className={styles.deletionStatus}>
+                                                    <div className="text-center mb-4">
+                                                        <div className={styles.statusIcon}><i className="bi bi-hourglass-split text-warning"></i></div>
+                                                        <h5 className="fw-bold text-warning mb-2">Account Deletion Pending</h5>
+                                                        <p className="text-muted">Your account deletion request is being processed. This usually takes 7-14 days to complete.</p>
+                                                    </div>
+                                                    <div className={styles.deletionDetails}>
+                                                        <h6 className="fw-semibold mb-3">Deletion Request Details</h6>
+                                                        <div className="row">
+                                                            <div className="col-md-6 mb-3">
+                                                                <div className={styles.detailItem}>
+                                                                    <span className={styles.detailLabel}>Request Date:</span>
+                                                                    <span className={styles.detailValue}>{moment(profile.accountDeletionRequest[0].createdAt).format('MMMM Do, YYYY')}</span>
+                                                                </div>
+                                                            </div>
+                                                            <div className="col-md-6 mb-3">
+                                                                <div className={styles.detailItem}>
+                                                                    <span className={styles.detailLabel}>Status:</span>
+                                                                    <span className={`badge bg-warning ${styles.statusBadge}`}>Pending Processing</span>
+                                                                </div>
+                                                            </div>
+                                                            <div className="col-12 mb-3">
+                                                                <div className={styles.detailItem}>
+                                                                    <span className={styles.detailLabel}>Request ID:</span>
+                                                                    <span className={styles.detailValue}>#{profile.accountDeletionRequest[0].id}</span>
+                                                                </div>
+                                                            </div>
+                                                            {profile.accountDeletionRequest[0].comment && (
+                                                                <div className="col-12">
+                                                                    <div className={styles.detailItem}>
+                                                                        <span className={styles.detailLabel}>Comment:</span>
+                                                                        <span className={styles.detailValue}>{profile.accountDeletionRequest[0].comment}</span>
+                                                                    </div>
+                                                                </div>
+                                                            )}
+                                                        </div>
+                                                    </div>
+                                                    <Alert variant="warning" className="mt-4">
+                                                        <Alert.Heading><i className="bi bi-exclamation-triangle me-2"></i>Important Information</Alert.Heading>
+                                                        <ul className="mb-0">
+                                                            <li>Your account will be permanently deleted after processing</li>
+                                                            <li>All your data, contributions, and history will be removed</li>
+                                                            <li>This action cannot be undone</li>
+                                                            <li>You will receive a confirmation email once processing is complete</li>
+                                                        </ul>
+                                                    </Alert>
+                                                </div>
+                                            ) : (
+                                                <div className={styles.closeAccountContent}>
+                                                    <div className="text-center mb-4">
+                                                        <div className={styles.warningIcon}><i className="bi bi-exclamation-triangle"></i></div>
+                                                        <h5 className="fw-bold text-danger mb-3">Close Your Account</h5>
+                                                        <p className="text-muted mb-4">This action will permanently delete your account and all associated data. Please read the information below carefully before proceeding.</p>
+                                                    </div>
+                                                    <Card className="border-danger mb-4">
+                                                        <Card.Header className="bg-danger text-white">
+                                                            <h6 className="mb-0"><i className="bi bi-shield-exclamation me-2"></i>What happens when you close your account</h6>
+                                                        </Card.Header>
+                                                        <Card.Body>
+                                                            <ul className="list-unstyled mb-0">
+                                                                <li className="mb-2"><i className="bi bi-x-circle text-danger me-2"></i>All your personal information will be permanently deleted</li>
+                                                                <li className="mb-2"><i className="bi bi-x-circle text-danger me-2"></i>Your contribution history will be removed</li>
+                                                                <li className="mb-2"><i className="bi bi-x-circle text-danger me-2"></i>Any active subscriptions will be cancelled</li>
+                                                                <li className="mb-2"><i className="bi bi-x-circle text-danger me-2"></i>Your referral credits and earnings will be lost</li>
+                                                                <li className="mb-2"><i className="bi bi-x-circle text-danger me-2"></i>API projects and credentials will be revoked</li>
+                                                                <li><i className="bi bi-x-circle text-danger me-2"></i>This action cannot be undone</li>
+                                                            </ul>
+                                                        </Card.Body>
+                                                    </Card>
+                                                    <Card className="border-info mb-4">
+                                                        <Card.Header className="bg-info text-white">
+                                                            <h6 className="mb-0"><i className="bi bi-lightbulb me-2"></i>Consider these alternatives first</h6>
+                                                        </Card.Header>
+                                                        <Card.Body>
+                                                            <div className="row">
+                                                                <div className="col-md-6 mb-3">
+                                                                    <div className="d-flex align-items-start">
+                                                                        <i className="bi bi-bell text-info me-3 mt-1"></i>
+                                                                        <div><h6 className="fw-semibold mb-1">Adjust Notifications</h6><p className="small text-muted mb-0">Turn off email and SMS notifications in Settings</p></div>
+                                                                    </div>
+                                                                </div>
+                                                                <div className="col-md-6 mb-3">
+                                                                    <div className="d-flex align-items-start">
+                                                                        <i className="bi bi-shield-lock text-info me-3 mt-1"></i>
+                                                                        <div><h6 className="fw-semibold mb-1">Update Privacy</h6><p className="small text-muted mb-0">Adjust your privacy settings and social media links</p></div>
+                                                                    </div>
+                                                                </div>
+                                                                <div className="col-md-6 mb-3">
+                                                                    <div className="d-flex align-items-start">
+                                                                        <i className="bi bi-pause-circle text-info me-3 mt-1"></i>
+                                                                        <div><h6 className="fw-semibold mb-1">Temporary Break</h6><p className="small text-muted mb-0">Consider taking a break instead of permanent deletion</p></div>
+                                                                    </div>
+                                                                </div>
+                                                                <div className="col-md-6 mb-3">
+                                                                    <div className="d-flex align-items-start">
+                                                                        <i className="bi bi-headset text-info me-3 mt-1"></i>
+                                                                        <div><h6 className="fw-semibold mb-1">Contact Support</h6><p className="small text-muted mb-0">Reach out to our support team for assistance</p></div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </Card.Body>
+                                                    </Card>
+                                                    <Card className="border-danger">
+                                                        <Card.Header className="bg-light">
+                                                            <h6 className="mb-0 text-danger"><i className="bi bi-trash me-2"></i>Request Account Deletion</h6>
+                                                        </Card.Header>
+                                                        <Card.Body>
+                                                            <Formik
+                                                                initialValues={{ confirmText: '', reason: '', password: '', understandConsequences: false }}
+                                                                validationSchema={Yup.object().shape({
+                                                                    confirmText: Yup.string().matches(/^DELETE MY ACCOUNT$/, 'Please type "DELETE MY ACCOUNT" to confirm').required('Confirmation text is required'),
+                                                                    reason: Yup.string().required('Please provide a reason for deletion'),
+                                                                    password: Yup.string().required('Your password is required to confirm deletion'),
+                                                                    understandConsequences: Yup.boolean().oneOf([true], 'You must acknowledge the consequences')
+                                                                })}
+                                                                onSubmit={(values, { setSubmitting }) => { handleDeleteAccount(values); setSubmitting(false); }}
+                                                            >
+                                                                {({ errors, touched, isSubmitting, handleSubmit, values }) => (
+                                                                    <Form onSubmit={handleSubmit}>
+                                                                        <Form.Group className="mb-3">
+                                                                            <Form.Label className="fw-semibold">Reason for leaving</Form.Label>
+                                                                            <Field as="select" name="reason" className={`form-control ${errors.reason && touched.reason ? "is-invalid" : ""}`}>
+                                                                                <option value="">Select a reason...</option>
+                                                                                <option value="privacy_concerns">Privacy concerns</option>
+                                                                                <option value="too_many_emails">Too many emails</option>
+                                                                                <option value="found_better_alternative">Found a better alternative</option>
+                                                                                <option value="technical_issues">Technical issues</option>
+                                                                                <option value="customer_service">Customer service issues</option>
+                                                                                <option value="other">Other</option>
+                                                                            </Field>
+                                                                            <ErrorMessage name="reason" component="div" className="invalid-feedback" />
+                                                                        </Form.Group>
+                                                                        <Form.Group className="mb-3">
+                                                                            <Form.Label className="fw-semibold">Confirm Your Password</Form.Label>
+                                                                            <Field name="password" type="password" className={`form-control ${errors.password && touched.password ? "is-invalid" : ""}`} placeholder="Enter your current password" />
+                                                                            <ErrorMessage name="password" component="div" className="invalid-feedback" />
+                                                                        </Form.Group>
+                                                                        <Form.Group className="mb-3">
+                                                                            <Form.Label className="fw-semibold">Type "DELETE MY ACCOUNT" to confirm</Form.Label>
+                                                                            <Field name="confirmText" type="text" className={`form-control ${errors.confirmText && touched.confirmText ? "is-invalid" : ""}`} placeholder="DELETE MY ACCOUNT" />
+                                                                            <ErrorMessage name="confirmText" component="div" className="invalid-feedback" />
+                                                                        </Form.Group>
+                                                                        <Form.Group className="mb-4">
+                                                                            <div className="form-check">
+                                                                                <Field name="understandConsequences" type="checkbox" className={`form-check-input ${errors.understandConsequences && touched.understandConsequences ? "is-invalid" : ""}`} id="understandConsequences" />
+                                                                                <label className="form-check-label text-danger fw-semibold" htmlFor="understandConsequences">
+                                                                                    I understand that this action cannot be undone and all my data will be permanently deleted
+                                                                                </label>
+                                                                                <ErrorMessage name="understandConsequences" component="div" className="invalid-feedback" />
+                                                                            </div>
+                                                                        </Form.Group>
+                                                                        <div className="d-grid">
+                                                                            <Button variant="danger" size="lg" type="submit" disabled={isSubmitting || !values.understandConsequences} className="fw-semibold">
+                                                                                {isSubmitting ? (
+                                                                                    <><Spinner animation="border" size="sm" className="me-2" />Processing Deletion Request...</>
+                                                                                ) : (
+                                                                                    <><i className="bi bi-trash me-2"></i>Permanently Delete My Account</>
+                                                                                )}
+                                                                            </Button>
+                                                                        </div>
+                                                                    </Form>
+                                                                )}
+                                                            </Formik>
+                                                        </Card.Body>
+                                                    </Card>
+                                                </div>
+                                            )}
+                                        </Card.Body>
+                                    </Card>
+                                </div>
+                                <div className="col-lg-4">
+                                    <Card className="border-0">
+                                        <Card.Body className="p-4">
+                                            <h6 className="fw-semibold mb-3"><i className="bi bi-question-circle me-2"></i>Need Help?</h6>
+                                            <div className={styles.helpItem}><i className="bi bi-envelope text-primary me-2"></i><div><div className="fw-semibold">Email Support</div><small className="text-muted">support@collectly.com</small></div></div>
+                                            <div className={styles.helpItem}><i className="bi bi-chat-dots text-primary me-2"></i><div><div className="fw-semibold">Live Chat</div><small className="text-muted">Available 24/7</small></div></div>
+                                            <div className={styles.helpItem}><i className="bi bi-telephone text-primary me-2"></i><div><div className="fw-semibold">Phone Support</div><small className="text-muted">1-800-COLLECTLY</small></div></div>
+                                            <hr className="my-3" />
+                                            <div className="text-center">
+                                                <Button variant="outline-primary" size="sm" onClick={() => { dispatch(setMessage({ message: 'Redirecting to support center...', type: 'info' })); setTimeout(() => navigate('/support'), 500); }}>
+                                                    <i className="bi bi-headset me-2"></i>Contact Support
+                                                </Button>
+                                            </div>
+                                        </Card.Body>
+                                    </Card>
+                                    {!profile?.accountDeletionRequest && (
+                                        <>
+                                            <Card className="border-primary mt-4">
+                                                <Card.Body className="p-4">
+                                                    <div className="text-center mb-3"><i className="bi bi-database text-primary display-6"></i></div>
+                                                    <h6 className="fw-semibold mb-3 text-center">Download Your Data</h6>
+                                                    <p className="small text-muted mb-3 text-center">Export all your personal data including profile information, contributions, and account activity.</p>
+                                                    <div className="d-grid gap-2">
+                                                        <Button variant="outline-primary" size="sm" className="w-100" onClick={handleDownloadPersonalData} disabled={isDownloadingData}>
+                                                            {isDownloadingData ? (<><Spinner animation="border" size="sm" className="me-2" />Preparing Download...</>) : (<><i className="bi bi-download me-2"></i>Export My Data</>)}
+                                                        </Button>
+                                                        {downloadHistory.length > 0 && (
+                                                            <div className="mt-3">
+                                                                <h6 className="small fw-semibold mb-2">Recent Exports</h6>
+                                                                {downloadHistory.slice(0, 3).map((item, index) => (
+                                                                    <div key={index} className="d-flex justify-content-between align-items-center small py-1">
+                                                                        <span className="text-muted">{moment(item.timestamp).format('MMM D, HH:mm')}</span>
+                                                                        <Badge bg={item.status === 'success' ? 'success' : item.status === 'error' ? 'danger' : 'warning'} className="ms-2">
+                                                                            {item.status === 'success' ? 'Downloaded' : item.status === 'error' ? 'Failed' : 'Pending'}
+                                                                        </Badge>
+                                                                    </div>
+                                                                ))}
+                                                            </div>
+                                                        )}
+                                                    </div>
+                                                </Card.Body>
+                                            </Card>
+                                            <Card className="border-info mt-3">
+                                                <Card.Body className="p-3">
+                                                    <h6 className="fw-semibold mb-2"><i className="bi bi-info-circle me-2"></i>What's Included</h6>
+                                                    <ul className="small text-muted mb-0 ps-3">
+                                                        <li>Profile information</li>
+                                                        <li>Contribution history</li>
+                                                        <li>Payment records</li>
+                                                        <li>Social media links</li>
+                                                        <li>Account settings</li>
+                                                        <li>API project details</li>
+                                                    </ul>
+                                                </Card.Body>
+                                            </Card>
+                                        </>
+                                    )}
+                                </div>
+                            </div>
+                        </div>
+                    )}
+
+                    {!activeTab && (
+                        <div className={styles.tabContentInner}>
+                            <p className="text-muted text-center py-4">Select a section above to get started.</p>
+                        </div>
+                    )}
                 </div>
 
                 {/* Sign Out */}
@@ -1882,6 +1885,7 @@ const Account = () => {
                 </div>
 
             </div>
+
 
             {/* ── Modals (preserved) ── */}
             <SubscriptionModal

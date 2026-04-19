@@ -95,6 +95,11 @@ const Login = () => {
       <section className={styles.loginArea}>
         <div className={styles.container}>
           <div className={styles.loginCard}>
+            <div className={styles.brandMark}>
+              <div className={styles.brandIcon}>
+                <i className="bi bi-lightning-charge-fill"></i>
+              </div>
+            </div>
             <div className={styles.header}>
               <h2 className={styles.title}>Welcome Back!</h2>
               <p className={styles.subtitle}>Login to your account and continue your financial collaboration journey</p>
